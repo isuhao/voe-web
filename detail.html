@@ -8,6 +8,11 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="css/templatemo_main.css">
     <script type="text/javascript" src="js/string-format.js"></script>
+    <script type="text/javascript">
+        format.extend(String.prototype);
+    </script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
 </head>
 <body>
 <div class="navbar navbar-inverse" role="navigation">
@@ -66,7 +71,7 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>服务器ID</th>
+                        <th>状态</th>
                         <th>频道ID</th>
                         <th>上游URL</th>
                         <th>绑定地址</th>
@@ -80,7 +85,7 @@
                     <tbody id="the_table_body">
                     </tbody>
                 </table>
-
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="show_add_channel();">添加频道</button>
             </div>
         </div>
     </div>
@@ -119,11 +124,15 @@
                             <tr>
                                 <td><p class="table-left-td">cache size: </p></td> <td ><input id="cache_size" value="65536" /></td>
                             </tr>
+                            <tr>
+                                <td><p class="table-left-td">启用 </p></td> <td ><input type="checkbox" id="is_enable" value="is_enable" checked /></td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <a href="sign-in.html" class="btn btn-primary">提交</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"  id="channel_model_dialog_submit_buttion">提交</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>
@@ -136,13 +145,13 @@
     </footer>
 </div>
 
-<script src="js/jquery.min.js"></script>
 <script type="text/javascript">
 
-    format.extend(String.prototype);
+    window.server_id = jQuery.getUrlParam('server_id');
+
 
     var tr_template = '<tr class="success">\
-            <td>{rowid}</td>\
+            <td>{is_enable_str}</td>\
             <td>{server_id}</td>\
             <td>{channel_id}</td>\
             <td>{source_url}</td>\
@@ -151,15 +160,14 @@
         <td>\
           <!-- Split button -->\
         <div class="btn-group">\
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="edit_channel_detail({server_id},{channel_id},\'{source_url}\')">编辑</button>\
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="edit_channel_detail({server_id},{channel_id},\'{source_url}\', {is_enable});">编辑</button>\
             <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">\
                 <span class="caret"></span>\
                 <span class="sr-only">Toggle Dropdown</span>\
             </button>\
             <ul class="dropdown-menu" role="menu">\
-                    <li><a href="#">查看频道流转</a></li>\
-            <li><a href="#">Font Awesome</a></li>\
-            <li><a href="#">jQuery</a></li>\
+                    <li><a href="channel_flow.html?channel_id={channel_id}" target="_blank">查看频道流转</a></li>\
+                    <li><a href="#" onclick="del_channel({server_id},{channel_id})">删除频道</a></li>\
             </ul>\
         </div>\
         </td>\
@@ -186,10 +194,16 @@
                     {
                         this_row.updown_status = { heath : -1,upload_speed:0, download_speed:0 };
                     }
+
+                    this_row.is_enable_str = "禁用";
+                    if (this_row.is_enable)
+                    {
+                        this_row.is_enable_str = "启用";
+                    }
                     // 循环插入表格.
                     var newtr = tr_template.format(this_row);
 
-                    $("#the_table_body").append(newtr);
+                    jQuery("#the_table_body").append(newtr);
 
 
                 }
@@ -197,22 +211,122 @@
         });
     };
 
-    function edit_channel_detail(server_id, channel_id, source_url)
+    function submit_mod_channel(submitdata, success)
+    {
+        ajaxpost('api/mod_channel', submitdata, function(data)
+        {
+            success(data['retcode']);
+        });
+    }
+
+    function submit_channel_detail_change(server_id, channel_id, source_url, is_enable)
+    {
+        console.log('submit_channel_detail_change sourceurl :');
+
+        var submitdata = {'server_id':window.server_id|0, 'channel_id':0, 'source_url':'', 'cache_size':0, 'is_enable': true};
+
+        submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() |0;
+        submitdata['source_url'] = jQuery('#edit_channel_dialog #source_url').val();
+        submitdata['cache_size'] = jQuery('#edit_channel_dialog #cache_size').val() |0;
+        submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
+
+        submit_mod_channel(submitdata, function(retcode)
+        {
+            if (retcode == 0)
+            {
+                window.location = '';
+            }
+            else
+            {
+                alert('添加失败');
+            }
+        });
+    }
+
+    function edit_channel_detail(server_id, channel_id, source_url, is_enable)
     {
         console.log('sourceurl :' + source_url);
-        $("#edit_channel_dialog #channel_id").val(channel_id);
-        $("#edit_channel_dialog #source_url").val(source_url);
+        jQuery("#edit_channel_dialog #channel_id").val(channel_id);
+        jQuery("#edit_channel_dialog #source_url").val(source_url);
+        jQuery("#edit_channel_dialog #channel_id").prop('readonly', true);
+        jQuery('#edit_channel_dialog #is_enable').prop("checked", is_enable);
 
+        jQuery("#channel_model_dialog_submit_buttion").unbind('click');
+        jQuery("#channel_model_dialog_submit_buttion").click(function () {
+            submit_channel_detail_change(server_id,channel_id, jQuery("#edit_channel_dialog #source_url").val(), jQuery('#edit_channel_dialog #is_enable').prop("checked"));
+        });
+    }
+
+    function submit_add_channel(submitdata, success)
+    {
+        ajaxpost('api/add_channel', submitdata, function(data)
+        {
+            success(data['retcode']);
+        });
+    }
+
+    function add_channel()
+    {
+        console.log('add_channel sourceurl :');
+
+        var submitdata = {'server_id':window.server_id|0, 'channel_id':0, 'source_url':'', 'cache_size':0, 'is_enable': true};
+
+        submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() |0;
+        submitdata['source_url'] = jQuery('#edit_channel_dialog #source_url').val();
+        submitdata['cache_size'] = jQuery('#edit_channel_dialog #cache_size').val() |0;
+        submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
+
+        submit_add_channel(submitdata, function(retcode)
+        {
+            if (retcode == 0)
+            {
+                window.location = '';
+            }
+            else
+            {
+                alert('添加失败');
+            }
+        });
+    }
+
+    function show_add_channel()
+    {
+        jQuery("#edit_channel_dialog #channel_id").val('');
+        jQuery("#edit_channel_dialog #source_url").val('');
+        jQuery("#edit_channel_dialog #channel_id").prop('readonly', false);
+        jQuery("#channel_model_dialog_submit_buttion").unbind('click');
+        jQuery("#channel_model_dialog_submit_buttion").click(add_channel);
+    }
+
+    function submit_del_channel(sid, cid, success)
+    {
+        var submitdata = { 'server_id': sid|0, 'channel_id': cid|0 };
+
+        ajaxpost('api/del_channel', submitdata, function(data)
+        {
+            success(data['retcode']);
+        });
+    }
+
+    function del_channel(sid, cid)
+    {
+        submit_del_channel(sid, cid, function (retcode)
+        {
+            // reload page
+            if (retcode)
+            {
+                alert('失败');
+            }
+            window.location = '';
+        });
     }
 </script>
 </body>
-<script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/templatemo_script.js"></script>
-<script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/check_login.js"></script>
 <script type="text/javascript">
-    $(document).ready(function(){
+    jQuery(document).ready(function(){
         ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);
     });
 </script>

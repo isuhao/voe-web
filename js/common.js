@@ -2,7 +2,7 @@
  * Created by cai on 15-4-21.
  */
 (function($){
-    $.getUrlParam = function(name)
+    jQuery.getUrlParam = function(name)
     {
         var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
@@ -12,7 +12,7 @@
 
 function ajaxpost(_url, jsondata, callback)
 {
-    $.ajax({
+    jQuery.ajax({
         type : "POST",
         url : _url,
         data : JSON.stringify(jsondata),
@@ -27,14 +27,5 @@ function ajaxpost(_url, jsondata, callback)
 
 function reload_page(pageurl)
 {
-    //if (window.history.pushState) {
-    //    var state = {
-    //        title: document.title
-    //        , url: document.location.href
-    //    };
-    //    var url = pageurl;
-    //    window.history.pushState(state, document.title, url);
-    //}
-
     window.location=pageurl;
 }

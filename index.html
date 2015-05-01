@@ -209,7 +209,7 @@
                 <td>{server_ip}</td>\
                 <td>{tport}</td>\
         <td>{uport}</td><td>{num_channels}</td>\
-        <td>{status}</td>\
+        <td>{status_str}</td>\
         <td>\
           <!-- Split button -->\
         <div class="btn-group">\
@@ -220,8 +220,6 @@
         </button>\
         <ul class="dropdown-menu" role="menu">\
                 <li><a href="#" onclick="del_server({server_id}, {num_channels})">删除服务器</a></li>\
-                <li><a href="#">Font Awesome</a></li>\
-                <li><a href="#">jQuery</a></li>\
         </ul>\
         </div>\
         </td>\
@@ -243,6 +241,20 @@
                 for (var i = 0; i < jsonobj["data"].length; i++)
                 {
                     // 循环插入表格.
+                    var status = (jsonobj["data"][i]["status"]);
+                    if( status < 0 )
+                    {
+                        jsonobj["data"][i]["status_str"] = "离线";
+                    }
+                    else if (status < 100)
+                    {
+                        jsonobj["data"][i]["status_str"] = "在线-健康度 : " + status ;
+                    }
+                    else
+                    {
+                        jsonobj["data"][i]["status_str"] = "在线-完美";
+                    }
+
                     var newtr = tr_template.format(jsonobj["data"][i]);
 
                     $("#the_table_body").append(newtr);
