@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="css/templatemo_main.css">
     <script type="text/javascript" src="js/string-format.js"></script>
+    <link rel="stylesheet" href="css/tables.css">
 </head>
 <body>
 <div class="navbar navbar-inverse" role="navigation">
@@ -79,7 +80,7 @@
                     <tbody id="the_table_body">
                     </tbody>
                 </table>
-
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add_server">添加服务器</button>
             </div>
         </div>
     </div>
@@ -98,15 +99,106 @@
             </div>
         </div>
     </div>
-
+    <!-- Modal - edit dialog -->
+    <div class="modal fade" id="add_server" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">添加服务器</h4>
+                </div>
+                <div class="templatemo-panels">
+                    <table class="table table-striped table-hover table-bordered" style="padding: 2em; margin-right: 3em">
+                        <tbody id="add_server_dialog">
+                        <tr>
+                            <td><p class="table-left-td">服务器id: </p></td> <td ><input id="server_id" /></td>
+                        </tr>
+                        <tr>
+                            <td><p class="table-left-td">tdp 端口: </p></td> <td ><input id="server_tcp_port" /></td>
+                        </tr>
+                        <tr>
+                            <td><p class="table-left-td">ucp 端口: </p></td> <td ><input id="server_ucp_port" /></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="add_server();">提交</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <footer class="templatemo-footer">
         <div class="templatemo-copyright">
             <p>Copyright &copy; 2015 <a href="#" target="_blank">VOE管理平台</a></p>
         </div>
     </footer>
 </div>
-
 <script src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/check_login.js"></script>
+
+<script type="text/javascript">
+    function submit_add_server(submitdata, success)
+    {
+        ajaxpost('api/add_server', submitdata, function(data)
+        {
+            success(data['retcode']);
+        });
+    }
+
+    function add_server()
+    {
+        console.log(
+                'add one server'
+        );
+        var submitdata = {'server_id':0, 'server_tcp_port':0, 'server_ucp_port':0 };
+
+        submitdata['server_id'] = $("#add_server_dialog #server_id").val() |0;
+        submitdata['server_tcp_port'] = $('#add_server_dialog #server_tcp_port').val() |0;
+        submitdata['server_ucp_port'] = $('#add_server_dialog #server_ucp_port').val() |0;
+
+        submit_add_server(submitdata, function(retcode)
+        {
+            if (retcode == 0)
+            {
+                window.location = '';
+            }
+            else
+            {
+                alert('失败');
+            }
+        });
+    }
+
+    function submit_del_del_server(sid, success)
+    {
+        var submitdata = { 'server_id': sid|0 };
+
+        ajaxpost('api/del_server', submitdata, function(data)
+        {
+            success(data['retcode']);
+        });
+    }
+
+    function del_server(sid, num_channels)
+    {
+        if (num_channels == 0) {
+            submit_del_del_server(sid, function (retcode) {
+                // reload page
+                if (retcode) {
+                    alert('失败');
+                }
+                window.location = '';
+            });
+        }else
+        {
+            alert('先删除频道!');
+        }
+    }
+</script>
+
 <script type="text/javascript">
 
     format.extend(String.prototype);
@@ -127,9 +219,9 @@
                 <span class="sr-only">Toggle Dropdown</span>\
         </button>\
         <ul class="dropdown-menu" role="menu">\
-                <li><a href="#">Bootstrap</a></li>\
-        <li><a href="#">Font Awesome</a></li>\
-        <li><a href="#">jQuery</a></li>\
+                <li><a href="#" onclick="del_server({server_id}, {num_channels})">删除服务器</a></li>\
+                <li><a href="#">Font Awesome</a></li>\
+                <li><a href="#">jQuery</a></li>\
         </ul>\
         </div>\
         </td>\
@@ -167,11 +259,8 @@
     }
 </script>
 </body>
-<script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/templatemo_script.js"></script>
-<script type="text/javascript" src="js/common.js"></script>
-<script type="text/javascript" src="js/check_login.js"></script>
 <script type="text/javascript">
     $(document).ready(function(){
         ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);
