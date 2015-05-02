@@ -215,7 +215,7 @@
     {
         ajaxpost('api/mod_channel', submitdata, function(data)
         {
-            success(data['retcode']);
+            success(data['retcode'], data['error_msg']);
         });
     }
 
@@ -230,7 +230,7 @@
         submitdata['cache_size'] = jQuery('#edit_channel_dialog #cache_size').val() |0;
         submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
 
-        submit_mod_channel(submitdata, function(retcode)
+        submit_mod_channel(submitdata, function(retcode, msg)
         {
             if (retcode == 0)
             {
@@ -238,7 +238,7 @@
             }
             else
             {
-                alert('添加失败');
+                alert('添加失败 : ' + msg);
             }
         });
     }
@@ -261,7 +261,7 @@
     {
         ajaxpost('api/add_channel', submitdata, function(data)
         {
-            success(data['retcode']);
+            success(data['retcode'], data['error_msg']);
         });
     }
 
@@ -276,7 +276,7 @@
         submitdata['cache_size'] = jQuery('#edit_channel_dialog #cache_size').val() |0;
         submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
 
-        submit_add_channel(submitdata, function(retcode)
+        submit_add_channel(submitdata, function(retcode,msg)
         {
             if (retcode == 0)
             {
@@ -284,7 +284,7 @@
             }
             else
             {
-                alert('添加失败');
+                alert('添加失败 : ' + msg);
             }
         });
     }
