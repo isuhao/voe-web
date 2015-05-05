@@ -174,8 +174,8 @@
 
     function show_add_server()
     {
-        $("#add_server_dialog #submit_dialog_data").unbind('click');
-        $("#add_server_dialog #submit_dialog_data").click(add_server);
+        $("#submit_dialog_data").unbind('click');
+        $("#submit_dialog_data").click(add_server);
     }
 
     function submit_del_del_server(sid, success)
@@ -204,10 +204,8 @@
         }
     }
 
-    function submit_mod_server(sid, success)
+    function submit_mod_server(submitdata, success)
     {
-        var submitdata = { 'server_id': sid|0 };
-
         ajaxpost('api/mod_server', submitdata, function(data)
         {
             success(data['retcode']);
@@ -217,11 +215,10 @@
     function mod_server(sid)
     {
         console.log(
-                'add one server'
+                'mod server'
         );
-        var submitdata = {'server_id':0, 'server_tcp_port':0, 'server_ucp_port':0 };
+        var submitdata = {'server_id':sid, 'server_tcp_port':0, 'server_ucp_port':0 };
 
-        submitdata['server_id'] = $("#add_server_dialog #server_id").val() |0;
         submitdata['server_tcp_port'] = $('#add_server_dialog #server_tcp_port').val() |0;
         submitdata['server_ucp_port'] = $('#add_server_dialog #server_ucp_port').val() |0;
 
@@ -233,24 +230,21 @@
             }
             else
             {
-                alert('失败');
+                alert('修改失败');
             }
         });
     }
 
     function show_mod_server(server_id, server_tcp_port, server_ucp_port)
     {
-        console.log(
-                'add one server'
-        );
-        var submitdata = {'server_id':0, 'server_tcp_port':0, 'server_ucp_port':0 };
-
         $("#add_server_dialog #server_id").val(server_id);
         $('#add_server_dialog #server_tcp_port').val(server_tcp_port);
         $('#add_server_dialog #server_ucp_port').val(server_ucp_port);
 
-        $("#add_server_dialog #submit_dialog_data").unbind('click');
-        $("#add_server_dialog #submit_dialog_data").click(mod_server(server_id));
+        $("#submit_dialog_data").unbind('click');
+        $("#submit_dialog_data").click(function () {
+            mod_server(server_id);
+        });
     }
 </script>
 
@@ -274,7 +268,7 @@
                 <span class="sr-only">Toggle Dropdown</span>\
         </button>\
         <ul class="dropdown-menu" role="menu">\
-            <li><a href="#" data-toggle="modal" data-target="#add_server" onclick="show_mod_server({server_id}, {tport}, {uport}">修改</a></li>\
+            <li><a href="#" data-toggle="modal" data-target="#add_server" onclick="show_mod_server({server_id}, {tport}, {uport})">修改</a></li>\
                 <li><a href="#" onclick="del_server({server_id}, {num_channels})">删除服务器</a></li>\
         </ul>\
         </div>\
