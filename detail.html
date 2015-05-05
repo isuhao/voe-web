@@ -161,14 +161,8 @@
           <!-- Split button -->\
         <div class="btn-group">\
             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="edit_channel_detail({server_id},{channel_id},\'{source_url}\', {is_enable});">编辑</button>\
-            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">\
-                <span class="caret"></span>\
-                <span class="sr-only">Toggle Dropdown</span>\
-            </button>\
-            <ul class="dropdown-menu" role="menu">\
-                    <li><a href="channel_flow.html?channel_id={channel_id}" target="_blank">查看频道流转</a></li>\
-                    <li><a href="#" onclick="del_channel({server_id},{channel_id})">删除频道</a></li>\
-            </ul>\
+            <a type="button" class="btn btn-info" href="channel_flow.html?channel_id={channel_id}" target="_blank">查看频道流转</a>\
+            <button type="button" class="btn btn-info" onclick="del_channel({server_id},{channel_id})">删除频道</button>\
         </div>\
         </td>\
         </tr>';
@@ -189,9 +183,14 @@
         }
     }
 
-    window.real_ready = function()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
+    function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
     {
         var server_id = $.getUrlParam('server_id');
+
+//        jQuery("#the_table_body").html('');
+
+        var table_content ='';
+
         $.ajax({
             type : "POST",
             url : "api/grid_server_detail?server_id=" + server_id,
@@ -224,10 +223,11 @@
                     // 循环插入表格.
                     var newtr = tr_template.format(this_row);
 
-                    jQuery("#the_table_body").append(newtr);
-
-
+                    table_content += newtr;
                 }
+
+                jQuery("#the_table_body").html(table_content);
+
             }
         });
     };
@@ -340,6 +340,17 @@
             }
             window.location = '';
         });
+    }
+
+
+    window.real_ready = function()
+    {
+        update_data();
+
+        $(function(){
+
+            setInterval("update_data()", 1000);
+        })
     }
 </script>
 </body>
