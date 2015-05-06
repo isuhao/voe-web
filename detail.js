@@ -83,15 +83,23 @@ function full_table_populate(populatedata)
     }
 }
 
+function update_or_no_touch_dom_html(dom, content)
+{
+    if (dom.html() != content)
+    {
+        dom.html(content);
+    }
+}
+
 function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
 {
     var server_id = $.getUrlParam('server_id');
 
     $.ajax({
-        type : "POST",
-        url : "api/grid_server_detail?server_id=" + server_id,
-        data : "pageSize=10&curPage=1",
-        success : function(data)	// 获取服务器状态数据.
+        type: "POST",
+        url: "api/grid_server_detail?server_id=" + server_id,
+        data: "pageSize=10&curPage=1",
+        success: function (data)	// 获取服务器状态数据.
         {
             var jsonobj = eval(data);
 
@@ -99,16 +107,23 @@ function update_data()	// 在窗口加载的时候，调用登陆，并且请求
                 full_table_populate(jsonobj['data']);
 
             // 接下来只更新想更新的数据.
-            for (var i=0; i< jsonobj['data'].length; i++)
-            {
+            for (var i = 0; i < jsonobj['data'].length; i++) {
                 var this_row = jsonobj['data'][i];
                 this_row.rowid = i;
                 this_row = prepare_template_data(this_row);
 
-                $(("#the_table_body #tdid_{rowid}_6".format(this_row))).html(
+                update_or_no_touch_dom_html(
+                    $(("#the_table_body #tdid_{rowid}_5".format(this_row))),
+                    '{updown_status.heath}'.format(this_row)
+                );
+
+                update_or_no_touch_dom_html(
+                    $(("#the_table_body #tdid_{rowid}_6".format(this_row))),
                     '{updown_status.upload_speed_auto}'.format(this_row)
                 );
-                $(("#the_table_body #tdid_{rowid}_7".format(this_row))).html(
+
+                update_or_no_touch_dom_html(
+                    $(("#the_table_body #tdid_{rowid}_7".format(this_row))),
                     '{updown_status.download_speed_auto}'.format(this_row)
                 );
             }
@@ -116,6 +131,35 @@ function update_data()	// 在窗口加载的时候，调用登陆，并且请求
             setTimeout(update_data, 1300);
         }
     });
+}
+
+function update_title()
+{
+    $.ajax({
+        type : "POST",
+        url : "api/get_server_config",
+        data : JSON.stringify({'server_id': server_id |0}),
+        success : function(data)	// 获取服务器状态数据.
+        {
+            var jsonobj = eval(data);
+
+
+            if (jsonobj['ip'] == null)
+            {
+                jsonobj.server_ip = '未在线';
+            }
+            else
+            {
+                jsonobj.server_ip = format_ip(jsonobj['ip']);
+            }
+
+            $("#table_title").html('SERVER_ID={1} 服务器详细情况({0})'.format(jsonobj.server_ip, server_id));
+
+            setTimeout(update_title, 9900);
+
+        }
+    });
+
 };
 
 function submit_mod_channel(submitdata, success)
@@ -170,14 +214,14 @@ function edit_channel_detail(server_id, channel_id, source_url, is_enable, url_t
     }else
     {
         $('#radio_source_server_id').prop('checked', true);
-//        radio2_changed($('#source_url'), $('.source_server_id_class'));
+        radio2_changed($('#source_url'), $('.source_server_id_class'));
 
         var ii = source_url.indexOf('://');
 
         var protocol = source_url.substr(0, ii);
 
         var sid = source_url.substr(ii + 3);
-        
+
         jQuery('#edit_channel_dialog #source_server_id').val(sid);
 
         if (protocol == 'udp')
@@ -198,7 +242,8 @@ function edit_channel_detail(server_id, channel_id, source_url, is_enable, url_t
     jQuery('#edit_channel_dialog #is_enable').prop("checked", is_enable);
 
     jQuery("#channel_model_dialog_submit_buttion").unbind('click');
-    jQuery("#channel_model_dialog_submit_buttion").click(function () {
+    jQuery("#channel_model_dialog_submit_buttion").click(function ()
+    {
         var surl = '';
         if (jQuery('#edit_channel_dialog #radio_source_url').prop('checked')) {
             surl = jQuery('#edit_channel_dialog #source_url').val();
@@ -245,17 +290,17 @@ function add_channel()
     submitdata['cache_size'] = 1024* ( jQuery('#edit_channel_dialog #cache_size').val() |0 );
     submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
 
-    submit_add_channel(submitdata, function(retcode,msg)
-    {
-        if (retcode == 0)
-        {
+    submit_add_channel(submitdata, function(retcode,msg) {
+        if (retcode == 0) {
             window.location = '';
         }
-        else
-        {
+        else {
             alert('添加失败 : ' + msg);
         }
-   function unction show_add_channel()
+    });
+}
+
+function  show_add_channel()
 {
     jQuery("#edit_channel_dialog #channel_id").val('');
     jQuery("#edit_channel_dialog #source_url").val('');
@@ -290,6 +335,7 @@ function del_channel(sid, cid)
 
 window.real_ready = function()
 {
+    update_title();
     update_data();
 }
 

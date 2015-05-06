@@ -74,6 +74,7 @@
                     <tr>
                         <th>#</th>
                         <th>服务器ID</th>
+                        <th>服务器名称</th>
                         <th>服务器IP</th>
                         <th>TCP端口</th>
                         <th>UDP端口</th>
@@ -120,6 +121,9 @@
                             <td><p class="table-left-td">服务器ID: </p></td> <td ><input id="server_id" /></td>
                         </tr>
                         <tr>
+                            <td><p class="table-left-td">服务器名称: </p></td> <td ><input id="server_name" /></td>
+                        </tr>
+                        <tr>
                             <td><p class="table-left-td">TCP 端口: </p></td> <td ><input id="server_tcp_port" /></td>
                         </tr>
                         <tr>
@@ -159,11 +163,12 @@
         console.log(
                 'add one server'
         );
-        var submitdata = {'server_id':0, 'server_tcp_port':0, 'server_ucp_port':0 };
+        var submitdata = {'server_id':0, 'server_name':"", 'server_tcp_port':0, 'server_ucp_port':0 };
 
         submitdata['server_id'] = $("#add_server_dialog #server_id").val() |0;
         submitdata['server_tcp_port'] = $('#add_server_dialog #server_tcp_port').val() |0;
         submitdata['server_ucp_port'] = $('#add_server_dialog #server_ucp_port').val() |0;
+        submitdata['server_name'] = $('#add_server_dialog #server_name').val();
 
         submit_add_server(submitdata, function(retcode)
         {
@@ -180,6 +185,7 @@
 
     function show_add_server()
     {
+        $("#add_server_dialog #server_id").prop('readonly', false);
         $("#submit_dialog_data").unbind('click');
         $("#submit_dialog_data").click(add_server);
     }
@@ -223,8 +229,9 @@
         console.log(
                 'mod server'
         );
-        var submitdata = {'server_id':sid, 'server_tcp_port':0, 'server_ucp_port':0 };
+        var submitdata = {'server_id':sid, 'server_name':"", 'server_tcp_port':0, 'server_ucp_port':0 };
 
+        submitdata['server_name'] = $('#add_server_dialog #server_name').val();
         submitdata['server_tcp_port'] = $('#add_server_dialog #server_tcp_port').val() |0;
         submitdata['server_ucp_port'] = $('#add_server_dialog #server_ucp_port').val() |0;
 
@@ -241,11 +248,21 @@
         });
     }
 
-    function show_mod_server(server_id, server_tcp_port, server_ucp_port)
+    function show_mod_server(server_id, rowid, server_tcp_port, server_ucp_port)
     {
+        alert(rowid);
+
+        var server_name = '';
+
+        server_name = $("#rowid_{0} #server_name".format(rowid)).text();
+
         $("#add_server_dialog #server_id").val(server_id);
+        $("#add_server_dialog #server_id").prop('readonly', true);
+
+
         $('#add_server_dialog #server_tcp_port').val(server_tcp_port);
         $('#add_server_dialog #server_ucp_port').val(server_ucp_port);
+        $('#add_server_dialog #server_name').val(server_name);
 
         $("#submit_dialog_data").unbind('click');
         $("#submit_dialog_data").click(function () {
@@ -258,9 +275,10 @@
 
     format.extend(String.prototype);
 
-    var tr_template = '<tr class="success">\
-                <td>{rowid}</td>\
+    var tr_template = '<tr class="success" id="rowid_{rowid}">\
+                <td></td>\
                 <td>{server_id}</td>\
+                <td id="server_name">{server_name}</td>\
                 <td>{server_ip}</td>\
                 <td>{tport}</td>\
         <td>{uport}</td><td>{num_channels}</td>\
@@ -274,7 +292,7 @@
                 <span class="sr-only">Toggle Dropdown</span>\
         </button>\
         <ul class="dropdown-menu" role="menu">\
-            <li><a href="#" data-toggle="modal" data-target="#add_server" onclick="show_mod_server({server_id}, {tport}, {uport})">修改</a></li>\
+            <li><a href="#" data-toggle="modal" data-target="#add_server" onclick="show_mod_server({server_id}, {rowid}, {tport}, {uport})">修改</a></li>\
                 <li><a href="#" onclick="del_server({server_id}, {num_channels})">删除服务器</a></li>\
         </ul>\
         </div>\
@@ -286,7 +304,7 @@
         $.ajax({
             type : "POST",
             url : "api/grid_server_status",
-            data : "pageSize=10&curPage=1",
+            data : "pageSize=100&curPage=1",
             success : function(data)	// 获取服务器状态数据.
             {
                 var jsonobj = eval(data);
@@ -296,6 +314,7 @@
 
                 for (var i = 0; i < jsonobj["data"].length; i++)
                 {
+                    jsonobj["data"][i].rowid = i;
                     if (jsonobj["data"][i]["ip"])
                         jsonobj["data"][i].server_ip = format_ip(jsonobj["data"][i]["ip"]);
                     else
@@ -318,31 +337,10 @@
                     var newtr = tr_template.format(jsonobj["data"][i]);
 
                     $("#the_table_body").append(newtr);
-
-
                 }
             }
         });
     };
-
-    function format_ip(ips)
-    {
-        var r= '';
-        for(var i =0; i < ips.length; i++)
-        {
-            if (r=='')
-            {
-
-            }
-            else
-            {
-                r += ', ';
-            }
-            r += ips[i];
-        }
-
-        return r;
-    }
 
     function goto_server_detail(server_id)
     {

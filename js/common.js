@@ -29,3 +29,22 @@ function reload_page(pageurl)
 {
     window.location=pageurl;
 }
+
+function format_ip(ips)
+{
+    var r= '';
+    for(var i =0; i < ips.length; i++)
+    {
+        if (r=='')
+        {
+
+        }
+        else
+        {
+            r += ', ';
+        }
+        r += ips[i];
+    }
+
+    return r;
+}
