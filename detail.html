@@ -58,7 +58,7 @@
                       </li>
              -->
             <li  class="active"><a href="index.html"><i class="fa fa-cubes"></i>服务器频道管理</a></li>
-            <!-- <li><a href="maps.html"><i class="fa fa-map-marker"></i>频道管理</a></li> -->
+            <li><a href="channels.html"><i class="fa fa-map-marker"></i>频道管理</a></li>
             <!-- <li><a href="tables.html"><i class="fa fa-users"></i>操作员管理</a></li> -->
             <!-- <li><a href="preferences.html"><i class="fa fa-cog"></i>Preferences</a></li> -->
             <li><a href="javascript:;" data-toggle="modal" data-target="#confirmModal"><i class="fa fa-sign-out"></i>退出</a></li>
@@ -126,7 +126,16 @@
                                 <td><p class="table-left-td">频道id: </p></td> <td ><input id="channel_id" /></td>
                             </tr>
                             <tr>
-                                <td><p class="table-left-td">上游url: </p></td> <td ><input id="source_url" /></td>
+                                <td class="table-left-td"><input id="radio_source_url" type="radio" name="source_url" checked onchange="radio2_changed($('.source_server_id_class'), $('#source_url'))" />上游url:</td>
+                                <td ><input id="source_url" type="url" name="source_url" /></td>
+                            </tr>
+                            <tr>
+                                <td class="table-left-td"><input id="radio_source_server_id" type="radio" name="source_url" onchange="radio2_changed($('#source_url'), $('.source_server_id_class'))"  />从这台服务器拉: </td>
+                                <td>
+                                    <input class="source_server_id_class" id="source_server_protocol_tcp" type="radio" name="source_server_protocol" disabled="disabled" checked> tcp
+                                    <input class="source_server_id_class" id="source_server_protocol_udp" type="radio" name="source_server_protocol" disabled="disabled" /> udp
+                                    <input class="source_server_id_class" id="source_server_id" name="source_server_id" disabled="disabled" />
+                                </td>
                             </tr>
                             <tr>
                                 <td><p class="table-left-td">缓冲大小: </p></td> <td ><input id="cache_size" value="65536" /></td>
@@ -151,219 +160,11 @@
         </div>
     </footer>
 </div>
-
-<script type="text/javascript">
-
-    window.server_id = jQuery.getUrlParam('server_id');
-
-
-    var tr_template = '<tr class="success">\
-            <td>{is_enable_str}</td>\
-            <td>{server_id}</td>\
-            <td>{channel_id}</td>\
-            <td>{source_url}</td>\
-            <td>{bind_address}</td>\
-            <td>{updown_status.heath}</td><td>{updown_status.upload_speed_auto}</td><td>{updown_status.download_speed_auto}</td>\
-        <td>\
-          <!-- Split button -->\
-        <div class="btn-group">\
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="edit_channel_detail({server_id},{channel_id},\'{source_url}\', {is_enable});">编辑</button>\
-            <a type="button" class="btn btn-info" href="channel_flow.html?channel_id={channel_id}" target="_blank">查看频道流转</a>\
-            <button type="button" class="btn btn-info" onclick="del_channel({server_id},{channel_id})">删除频道</button>\
-        </div>\
-        </td>\
-        </tr>';
-
-    function format_speed(speed)
-    {
-        if ( speed < 1024 )
-        {
-            return speed + " Byte/s";
-        }
-        else if ( speed < 1024*1024 )
-        {
-            return (speed / 1024).toFixed(2) + ' KiB/s';
-        }
-        else if ( speed < 1024*1024*1024 )
-        {
-            return (speed / 1024 / 1024).toFixed(2) + ' MiB/s';
-        }
-    }
-
-    function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
-    {
-        var server_id = $.getUrlParam('server_id');
-
-//        jQuery("#the_table_body").html('');
-
-        var table_content ='';
-
-        $.ajax({
-            type : "POST",
-            url : "api/grid_server_detail?server_id=" + server_id,
-            data : "pageSize=10&curPage=1",
-            success : function(data)	// 获取服务器状态数据.
-            {
-                var jsonobj = eval(data);
-
-                console.log("success status: " + jsonobj["success"]);
-                console.log("length: " + jsonobj["data"].length);
-
-                for (var i = 0; i < jsonobj["data"].length; i++)
-                {
-                    var this_row = jsonobj["data"][i];
-                    if (! this_row.updown_status)
-                    {
-                        this_row.updown_status = { heath : -1,upload_speed_auto:0, download_speed_auto:0 };
-                    }
-                    else
-                    {
-                        this_row.updown_status.upload_speed_auto = format_speed(this_row.updown_status.upload_speed);
-                        this_row.updown_status.download_speed_auto= format_speed(this_row.updown_status.download_speed);
-                    }
-
-                    this_row.is_enable_str = "禁用";
-                    if (this_row.is_enable)
-                    {
-                        this_row.is_enable_str = "启用";
-                    }
-                    // 循环插入表格.
-                    var newtr = tr_template.format(this_row);
-
-                    table_content += newtr;
-                }
-
-                jQuery("#the_table_body").html(table_content);
-
-            }
-        });
-    };
-
-    function submit_mod_channel(submitdata, success)
-    {
-        ajaxpost('api/mod_channel', submitdata, function(data)
-        {
-            success(data['retcode'], data['error_msg']);
-        });
-    }
-
-    function submit_channel_detail_change(server_id, channel_id, source_url, is_enable)
-    {
-        console.log('submit_channel_detail_change sourceurl :');
-
-        var submitdata = {'server_id':window.server_id|0, 'channel_id':0, 'source_url':'', 'cache_size':0, 'is_enable': true};
-
-        submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() |0;
-        submitdata['source_url'] = jQuery('#edit_channel_dialog #source_url').val();
-        submitdata['cache_size'] = jQuery('#edit_channel_dialog #cache_size').val() |0;
-        submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
-
-        submit_mod_channel(submitdata, function(retcode, msg)
-        {
-            if (retcode == 0)
-            {
-                window.location = '';
-            }
-            else
-            {
-                alert('添加失败 : ' + msg);
-            }
-        });
-    }
-
-    function edit_channel_detail(server_id, channel_id, source_url, is_enable)
-    {
-        console.log('sourceurl :' + source_url);
-        jQuery("#edit_channel_dialog #channel_id").val(channel_id);
-        jQuery("#edit_channel_dialog #source_url").val(source_url);
-        jQuery("#edit_channel_dialog #channel_id").prop('readonly', true);
-        jQuery('#edit_channel_dialog #is_enable').prop("checked", is_enable);
-
-        jQuery("#channel_model_dialog_submit_buttion").unbind('click');
-        jQuery("#channel_model_dialog_submit_buttion").click(function () {
-            submit_channel_detail_change(server_id,channel_id, jQuery("#edit_channel_dialog #source_url").val(), jQuery('#edit_channel_dialog #is_enable').prop("checked"));
-        });
-    }
-
-    function submit_add_channel(submitdata, success)
-    {
-        ajaxpost('api/add_channel', submitdata, function(data)
-        {
-            success(data['retcode'], data['error_msg']);
-        });
-    }
-
-    function add_channel()
-    {
-        console.log('add_channel sourceurl :');
-
-        var submitdata = {'server_id':window.server_id|0, 'channel_id':0, 'source_url':'', 'cache_size':0, 'is_enable': true};
-
-        submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() |0;
-        submitdata['source_url'] = jQuery('#edit_channel_dialog #source_url').val();
-        submitdata['cache_size'] = jQuery('#edit_channel_dialog #cache_size').val() |0;
-        submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
-
-        submit_add_channel(submitdata, function(retcode,msg)
-        {
-            if (retcode == 0)
-            {
-                window.location = '';
-            }
-            else
-            {
-                alert('添加失败 : ' + msg);
-            }
-        });
-    }
-
-    function show_add_channel()
-    {
-        jQuery("#edit_channel_dialog #channel_id").val('');
-        jQuery("#edit_channel_dialog #source_url").val('');
-        jQuery("#edit_channel_dialog #channel_id").prop('readonly', false);
-        jQuery("#channel_model_dialog_submit_buttion").unbind('click');
-        jQuery("#channel_model_dialog_submit_buttion").click(add_channel);
-    }
-
-    function submit_del_channel(sid, cid, success)
-    {
-        var submitdata = { 'server_id': sid|0, 'channel_id': cid|0 };
-
-        ajaxpost('api/del_channel', submitdata, function(data)
-        {
-            success(data['retcode']);
-        });
-    }
-
-    function del_channel(sid, cid)
-    {
-        submit_del_channel(sid, cid, function (retcode)
-        {
-            // reload page
-            if (retcode)
-            {
-                alert('失败');
-            }
-            window.location = '';
-        });
-    }
-
-
-    window.real_ready = function()
-    {
-        update_data();
-
-        $(function(){
-
-            setInterval("update_data()", 1000);
-        })
-    }
-</script>
 </body>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/templatemo_script.js"></script>
 <script type="text/javascript" src="js/check_login.js"></script>
+<script type="text/javascript" src="detail.js"></script>
 <script type="text/javascript">
     jQuery(document).ready(function(){
         ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);

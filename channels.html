@@ -52,8 +52,8 @@
                         </ul>
                       </li>
              -->
-            <li class="active"><a href="index.html"><i class="fa fa-cubes"></i>服务器频道管理</a></li>
-            <li><a href="channels.html"><i class="fa fa-map-marker"></i>频道管理</a></li>
+            <li><a href="index.html"><i class="fa fa-cubes"></i>服务器频道管理</a></li>
+            <li class="active"><a href="channels.html"><i class="fa fa-map-marker"></i>频道管理</a></li>
             <!-- <li><a href="tables.html"><i class="fa fa-users"></i>操作员管理</a></li> -->
             <!-- <li><a href="preferences.html"><i class="fa fa-cog"></i>Preferences</a></li> -->
             <li><a href="javascript:;" data-toggle="modal" data-target="#confirmModal"><i class="fa fa-sign-out"></i>退出</a></li>
@@ -64,7 +64,7 @@
         <div class="templatemo-content">
             <ol class="breadcrumb">
                 <li><a href="index.html">首页</a></li>
-                <li><a href="#">服务器管理</a></li>
+                <li><a href="#">频道管理</a></li>
             </ol>
             <div class="templatemo-panels" style="height:999px">
 
@@ -73,12 +73,11 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>服务器ID</th>
-                        <th>服务器IP</th>
-                        <th>TCP端口</th>
-                        <th>UDP端口</th>
-                        <th>频道数</th>
-                        <th>状态</th>
+                        <th>频道ID</th>
+                        <th>频道名称</th>
+                        <th>服务器数</th>
+                        <th>总源头服务器ID</th>
+                        <th>总源头url</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -86,7 +85,6 @@
                     <tbody id="the_table_body">
                     </tbody>
                 </table>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add_server" onclick="show_add_server()">添加服务器</button>
             </div>
         </div>
     </div>
@@ -106,35 +104,6 @@
         </div>
     </div>
     <!-- Modal - edit dialog -->
-    <div class="modal fade" id="add_server" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">添加服务器</h4>
-                </div>
-                <div class="templatemo-panels">
-                    <table class="table table-striped table-hover table-bordered" style="padding: 2em; margin-right: 3em">
-                        <tbody id="add_server_dialog">
-                        <tr>
-                            <td><p class="table-left-td">服务器id: </p></td> <td ><input id="server_id" /></td>
-                        </tr>
-                        <tr>
-                            <td><p class="table-left-td">tdp 端口: </p></td> <td ><input id="server_tcp_port" /></td>
-                        </tr>
-                        <tr>
-                            <td><p class="table-left-td">ucp 端口: </p></td> <td ><input id="server_ucp_port" /></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button id="submit_dialog_data" type="button" class="btn btn-default" data-dismiss="modal">提交</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <footer class="templatemo-footer">
         <div class="templatemo-copyright">
             <p>Copyright &copy; 2015 <a href="#" target="_blank">VOE管理平台</a></p>
@@ -260,33 +229,26 @@
 
     var tr_template = '<tr class="success">\
                 <td>{rowid}</td>\
-                <td>{server_id}</td>\
-                <td>{server_ip}</td>\
-                <td>{tport}</td>\
-        <td>{uport}</td><td>{num_channels}</td>\
-        <td>{status_str}</td>\
+                <td>{channel_id}</td>\
+                <td>{channel_name}</td>\
+                <td>{channel_servers}</td>\
+                <td><a href="detail.html?server_id={channel_source_server_id}">{channel_source_server_id}</a></td>\
+                <td>{channel_source_url}</td>\
         <td>\
           <!-- Split button -->\
         <div class="btn-group">\
-                <button type="button" class="btn btn-info" onclick="goto_server_detail({server_id})">详情</button>\
-                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">\
-                <span class="caret"></span>\
-                <span class="sr-only">Toggle Dropdown</span>\
-        </button>\
-        <ul class="dropdown-menu" role="menu">\
-            <li><a href="#" data-toggle="modal" data-target="#add_server" onclick="show_mod_server({server_id}, {tport}, {uport})">修改</a></li>\
-                <li><a href="#" onclick="del_server({server_id}, {num_channels})">删除服务器</a></li>\
-        </ul>\
+                <a type="button" class="btn btn-info" href="channel_flow.html?channel_id={channel_id}" target="_blank">详情</a>\
         </div>\
         </td>\
         </tr>';
 
+    window.curPage = 1;
     window.real_ready = function()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
     {
         $.ajax({
             type : "POST",
-            url : "api/grid_server_status",
-            data : "pageSize=10&curPage=1",
+            url : "api/get_channels",
+            data : "pageSize=10&curPage=" + window.curPage,
             success : function(data)	// 获取服务器状态数据.
             {
                 var jsonobj = eval(data);
@@ -296,26 +258,14 @@
 
                 for (var i = 0; i < jsonobj["data"].length; i++)
                 {
-                    if (jsonobj["data"][i]["ip"])
-                        jsonobj["data"][i].server_ip = format_ip(jsonobj["data"][i]["ip"]);
-                    else
-                        jsonobj["data"][i].server_ip = '未在线';
-                    // 循环插入表格.
-                    var status = (jsonobj["data"][i]["status"]);
-                    if( status < 0 )
+                    var rowdata = jsonobj["data"][i];
+
+                    if (rowdata.channel_name == null)
                     {
-                        jsonobj["data"][i]["status_str"] = "离线";
-                    }
-                    else if (status < 100)
-                    {
-                        jsonobj["data"][i]["status_str"] = "在线-健康度 : " + status ;
-                    }
-                    else
-                    {
-                        jsonobj["data"][i]["status_str"] = "在线-完美";
+                        rowdata.channel_name = "未设定";
                     }
 
-                    var newtr = tr_template.format(jsonobj["data"][i]);
+                    var newtr = tr_template.format(rowdata);
 
                     $("#the_table_body").append(newtr);
 
