@@ -8,6 +8,10 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="css/templatemo_main.css">
     <script type="text/javascript" src="js/string-format.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="js/check_login.js"></script>
+
     <link rel="stylesheet" href="css/tables.css">
     <style type="text/css">
         .navbar-header a:link { color: darkgray; text-decoration: none;}
@@ -15,6 +19,14 @@
         .navbar-header a:hover { text-decoration:underline;}
         .navbar-header a:visited { text-decoration: none;}
     </style>
+    <script type="text/javascript">
+        window.curpage = $.getUrlParam('curpage');
+        if (window.curpage == null)
+        {
+            window.curpage = 1;
+        }
+        window.curpage = window.curpage |0;
+    </script>
 </head>
 <body>
 <div class="navbar navbar-inverse" role="navigation">
@@ -69,6 +81,9 @@
             <div class="templatemo-panels" style="height:999px">
 
                 <h4 class="margin-bottom-15">服务器</h4>
+
+                <span style="display: inline" id="curPage_indicator"></span>
+
                 <table class="table table-striped table-hover table-bordered">
                     <thead>
                     <tr>
@@ -88,6 +103,8 @@
                     </tbody>
                 </table>
                 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add_server" onclick="show_add_server()">添加服务器</button>
+                <a type="button" class="btn btn-info" id="prepage" >上一页</a>
+                <a type="button" class="btn btn-info" id="nextpage" >下一页</a>
             </div>
         </div>
     </div>
@@ -145,9 +162,6 @@
         </div>
     </footer>
 </div>
-<script src="js/jquery.min.js"></script>
-<script type="text/javascript" src="js/common.js"></script>
-<script type="text/javascript" src="js/check_login.js"></script>
 
 <script type="text/javascript">
     function submit_add_server(submitdata, success)
@@ -299,18 +313,36 @@
         </td>\
         </tr>';
 
+    $('#prepage').hide();
+    $('#nextpage').hide();
+
+    $('#curPage_indicator').html('当前第{0}页'.format(window.curpage));
+
     window.real_ready = function()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
     {
+        var page_size = 20;
+        if (window.curpage > 1) {
+            $('#prepage').prop('href', 'index.html?curpage={0}'.format((window.curpage | 0) - 1));
+            $('#prepage').show();
+        }
+
         $.ajax({
             type : "POST",
             url : "api/grid_server_status",
-            data : "pageSize=100&curPage=1",
+            data : 'pageSize={1}&curPage={0}'.format(window.curpage, page_size),
             success : function(data)	// 获取服务器状态数据.
             {
                 var jsonobj = eval(data);
 
                 console.log("success status: " + jsonobj["success"]);
                 console.log("length: " + jsonobj["data"].length);
+
+                if (window.curpage < jsonobj["pageCount"]) {
+                    $('#nextpage').show();
+                    $('#nextpage').prop('href', 'index.html?curpage={0}'.format((window.curpage | 0) + 1));
+                }
+
+                $('#curPage_indicator').html('当前第{curPage}页, 共{pageCount}页'.format(jsonobj));
 
                 for (var i = 0; i < jsonobj["data"].length; i++)
                 {

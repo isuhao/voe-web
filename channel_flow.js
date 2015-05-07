@@ -41,7 +41,7 @@ function display_channel_flow(flowjson)
         }
 
 
-        o.setSize(150, opt_height);
+        o.setSize(220, opt_height);
         o.addNode(sid|0, pid, 'u', textlabel, 0, href);
 
     }

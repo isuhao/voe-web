@@ -72,8 +72,8 @@
                 <li><a href="#">服务器频道管理</a></li>
             </ol>
             <div class="templatemo-panels" style="height:999px">
-
                 <h4 class="margin-bottom-15" id="table_title">服务器详细情况</h4>
+                <span style="display: inline" id="curPage_indicator"></span>
                 <table class="table table-striped table-hover table-bordered">
                     <thead>
                     <tr>
@@ -88,11 +88,12 @@
                         <th>操作</th>
                     </tr>
                     </thead>
-
                     <tbody id="the_table_body">
                     </tbody>
                 </table>
                 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="show_add_channel();">添加频道</button>
+                <a type="button" class="btn btn-info" id="prepage" >上一页</a>
+                <a type="button" class="btn btn-info" id="nextpage" >下一页</a>
             </div>
         </div>
     </div>

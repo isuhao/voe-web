@@ -3,6 +3,13 @@
  */
 
 window.server_id = jQuery.getUrlParam('server_id');
+window.curpage = $.getUrlParam('curpage');
+if (window.curpage == null)
+{
+    window.curpage = 1;
+}
+window.curpage = window.curpage |0;
+window.server_id = window.server_id|0;
 
 var tr_template = '<tr class="success" id="trid{rowid}">\
             <td id="tdid_{rowid}_0">{is_enable_str}</td>\
@@ -94,14 +101,30 @@ function update_or_no_touch_dom_html(dom, content)
 function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
 {
     var server_id = $.getUrlParam('server_id');
+    var page_size = 20;
 
     $.ajax({
         type: "POST",
         url: "api/grid_server_detail?server_id=" + server_id,
-        data: "pageSize=10&curPage=1",
+        data: "pageSize={0}&curPage={1}".format(page_size, window.curpage),
         success: function (data)	// 获取服务器状态数据.
         {
+            $('#prepage').hide();
+            $('#nextpage').hide();
+
             var jsonobj = eval(data);
+
+            if (window.curpage > 1) {
+                $('#prepage').prop('href', 'detail.html?curpage={0}'.format((window.curpage | 0) - 1));
+                $('#prepage').show();
+            }
+
+            if (window.curpage < jsonobj["pageCount"]) {
+                $('#nextpage').show();
+                $('#nextpage').prop('href', 'detail.html?curpage={0}'.format((window.curpage | 0) + 1));
+            }
+
+            $('#curPage_indicator').html('当前第{curPage}页, 共{pageCount}页'.format(jsonobj));
 
             if (table_length != jsonobj['data'].length)
                 full_table_populate(jsonobj['data']);
@@ -111,6 +134,9 @@ function update_data()	// 在窗口加载的时候，调用登陆，并且请求
                 var this_row = jsonobj['data'][i];
                 this_row.rowid = i;
                 this_row = prepare_template_data(this_row);
+
+                if ( $(("#the_table_body #tdid_{rowid}_2".format(this_row))).text() !=  this_row['channel_id'])
+                    full_table_populate(jsonobj['data']);
 
                 update_or_no_touch_dom_html(
                     $(("#the_table_body #tdid_{rowid}_5".format(this_row))),
@@ -142,7 +168,6 @@ function update_title()
         success : function(data)	// 获取服务器状态数据.
         {
             var jsonobj = eval(data);
-
 
             if (jsonobj['ip'] == null)
             {
@@ -332,6 +357,7 @@ function del_channel(sid, cid)
     });
 }
 
+$('#curPage_indicator').html('当前第{0}页'.format(window.curpage));
 
 window.real_ready = function()
 {

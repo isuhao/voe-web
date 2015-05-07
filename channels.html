@@ -68,7 +68,8 @@
             </ol>
             <div class="templatemo-panels" style="height:999px">
 
-                <h4 class="margin-bottom-15">服务器</h4>
+                <h4 class="margin-bottom-15">频道列表</h4>
+                <span style="display: inline" id="curPage_indicator"></span>
                 <table class="table table-striped table-hover table-bordered">
                     <thead>
                     <tr>
@@ -85,6 +86,8 @@
                     <tbody id="the_table_body">
                     </tbody>
                 </table>
+                <a type="button" class="btn btn-info" id="prepage" >上一页</a>
+                <a type="button" class="btn btn-info" id="nextpage" >下一页</a>
             </div>
         </div>
     </div>
@@ -227,6 +230,15 @@
 
     format.extend(String.prototype);
 
+    window.curpage = $.getUrlParam('curpage');
+    if (window.curpage == null)
+    {
+        window.curpage = 1;
+    }
+    window.curpage = window.curpage |0;
+
+    $('#curPage_indicator').html('当前第{0}页'.format(window.curpage));
+
     var tr_template = '<tr class="success">\
                 <td>{rowid}</td>\
                 <td>{channel_id}</td>\
@@ -242,19 +254,35 @@
         </td>\
         </tr>';
 
-    window.curPage = 1;
     window.real_ready = function()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
     {
+        $('#prepage').hide();
+        $('#nextpage').hide();
+
+        if (window.curpage > 1) {
+            $('#prepage').prop('href', 'channels.html?curpage={0}'.format((window.curpage | 0) - 1));
+            $('#prepage').show();
+        }
+
+        var page_size = 20;
+
         $.ajax({
             type : "POST",
             url : "api/get_channels",
-            data : "pageSize=10&curPage=" + window.curPage,
+            data : "pageSize=20&curPage=" + window.curpage,
             success : function(data)	// 获取服务器状态数据.
             {
                 var jsonobj = eval(data);
 
                 console.log("success status: " + jsonobj["success"]);
                 console.log("length: " + jsonobj["data"].length);
+
+                if (window.curpage < jsonobj["pageCount"]) {
+                    $('#nextpage').show();
+                    $('#nextpage').prop('href', 'channels.html?curpage={0}'.format((window.curpage | 0) + 1));
+                }
+
+                $('#curPage_indicator').html('当前第{curPage}页, 共{pageCount}页'.format(jsonobj));
 
                 for (var i = 0; i < jsonobj["data"].length; i++)
                 {
