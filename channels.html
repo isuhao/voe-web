@@ -86,6 +86,7 @@
                     <tbody id="the_table_body">
                     </tbody>
                 </table>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="show_add_server()">添加频道</button>
                 <a type="button" class="btn btn-info" id="prepage" >上一页</a>
                 <a type="button" class="btn btn-info" id="nextpage" >下一页</a>
             </div>
@@ -107,6 +108,41 @@
         </div>
     </div>
     <!-- Modal - edit dialog -->
+    <div class="modal fade" id="edit_channel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">频道设置</h4>
+                </div>
+                <div >
+                    <table class="table table-striped table-hover table-bordered">
+                        <tbody id="edit_channel_dialog">
+                        <tr>
+                            <td><p class="table-left-td">频道ID: </p></td> <td ><input id="channel_id" type="number" placeholder="频道id, 是个数字" /></td>
+                        </tr>
+                        <tr>
+                            <td><p class="table-left-td">频道名称: </p></td> <td ><input id="channel_name" placeholder="频道名字, 比如 CCTV-5" /></td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-td">上游url:</td><td ><input id="source_url" type="url" placeholder="从哪里拉流" /></td>
+                        </tr>
+                        <tr>
+                            <td class="table-left-td">拉流服务器:</td><td ><input id="source_server_id" type="number" placeholder="使用哪台服务器拉流?" /></td>
+                        </tr>
+                        <tr>
+                            <td><p class="table-left-td">启用 </p></td> <td ><input type="checkbox" id="is_enable" value="is_enable" checked /></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"  id="channel_model_dialog_submit_buttion">提交</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <footer class="templatemo-footer">
         <div class="templatemo-copyright">
             <p>Copyright &copy; 2015 <a href="#" target="_blank">VOE管理平台</a></p>

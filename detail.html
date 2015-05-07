@@ -15,10 +15,11 @@
     <script type="text/javascript" src="js/common.js"></script>
 
     <style type="text/css">
-    .navbar-header a:link { color: darkgray; text-decoration: none;}
-    .navbar-header a:active { text-decoration:blink}
-    .navbar-header a:hover { text-decoration:underline;}
-    .navbar-header a:visited { text-decoration: none;}
+        .navbar-header a:link { color: darkgray; text-decoration: none;}
+        .navbar-header a:active { text-decoration:blink}
+        .navbar-header a:hover { text-decoration:underline;}
+        .navbar-header a:visited { text-decoration: none;}
+        input {width: 100%;}
     </style>
 </head>
 <body>
@@ -118,25 +119,30 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">编辑频道设置</h4>
+                    <h4 class="modal-title">编辑频道设置</h4>
                 </div>
                 <div >
                     <table class="table table-striped table-hover table-bordered">
                         <tbody id="edit_channel_dialog">
                             <tr>
-                                <td><p class="table-left-td">频道ID: </p></td> <td ><input id="channel_id" /></td>
+                                <td><p class="table-left-td">频道ID: </p></td> <td ><input id="channel_id" placeholder="要添加的频道ID" /></td>
                             </tr>
                             <tr>
-                                <td class="table-left-td"><input id="radio_source_url" type="radio" name="source_url" checked onchange="radio2_changed($('.source_server_id_class'), $('#source_url'))" />上游url:</td>
-                                <td ><input id="source_url" type="url" name="source_url" /></td>
-                            </tr>
-                            <tr>
-                                <td class="table-left-td"><input id="radio_source_server_id" type="radio" name="source_url" onchange="radio2_changed($('#source_url'), $('.source_server_id_class'))"  />从这台服务器拉: </td>
+                                <td class="table-left-td">上游传输服务器: </td>
                                 <td>
-                                    <input class="source_server_id_class" id="source_server_protocol_tcp" type="radio" name="source_server_protocol" disabled="disabled" checked> tcp
-                                    <input class="source_server_id_class" id="source_server_protocol_udp" type="radio" name="source_server_protocol" disabled="disabled" /> udp
                                     <input class="source_server_id_class" id="source_server_id" name="source_server_id" disabled="disabled" placeholder="填写服务器id" />
                                 </td>
+                            </tr>
+                            <tr>
+                                <td><p class="table-left-td">使用传输协议:</p>
+                                </td>
+                                <td>
+                                    <input class="source_server_id_class" id="source_server_protocol_tcp" type="radio" name="source_server_protocol" style="width: auto" checked> tcp
+                                    <input class="source_server_id_class" id="source_server_protocol_udp" type="radio" name="source_server_protocol" style="width: auto" /> udp
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><p class="table-left-td">绑定地址: </p></td> <td ><input id="bind_address" placeholder="服务器有多个ip的情况下, 使用这个地址" /></td>
                             </tr>
                             <tr>
                                 <td><p class="table-left-td">缓冲大小: </p></td> <td ><input id="cache_size" value="65536" /></td>
@@ -144,7 +150,6 @@
                             <tr>
                                 <td><p class="table-left-td">启用 </p></td> <td ><input type="checkbox" id="is_enable" value="is_enable" checked /></td>
                             </tr>
-
                         </tbody>
                     </table>
                 </div>
