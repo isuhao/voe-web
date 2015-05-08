@@ -24,7 +24,7 @@ function add_channel() {
             window.location = '';
         }
         else {
-            alert(' ß∞‹');
+            alert('Â§±Ë¥•');
         }
     });
 }
@@ -47,12 +47,12 @@ function del_server(sid, num_channels) {
         submit_del_del_server(sid, function (retcode) {
             // reload page
             if (retcode) {
-                alert(' ß∞‹');
+                alert('Â§±Ë¥•');
             }
             window.location = '';
         });
     } else {
-        alert('œ»…æ≥˝∆µµ¿!');
+        alert('ÂÖàÂà†Èô§È¢ëÈÅì!');
     }
 }
 
@@ -79,7 +79,7 @@ function mod_channel(rowid, channel_id) {
             window.location = '';
         }
         else {
-            alert('–ﬁ∏ƒ ß∞‹');
+            alert('‰øÆÊîπÂ§±Ë¥•');
         }
     });
 }
