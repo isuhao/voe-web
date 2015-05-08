@@ -23,7 +23,7 @@ var tr_template = '<tr class="success" id="trid{rowid}">\
         <td id="tdid_{rowid}_8">\
           <!-- Split button -->\
         <div class="btn-group">\
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="edit_channel_detail({server_id},{channel_id},\'{source_url}\', {is_enable}, {url_type});">编辑</button>\
+            <button type="button" id="edit_channel_buttion_{rowid}" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="edit_channel_detail({server_id},{channel_id},\'{source_url}\', {is_enable}, {is_chain_leader});">编辑</button>\
             <a type="button" class="btn btn-info" href="channel_flow.html?channel_id={channel_id}" target="_blank">查看频道流转</a>\
             <button type="button" class="btn btn-info" onclick="del_channel({server_id},{channel_id})">删除频道</button>\
         </div>\
@@ -154,6 +154,16 @@ function update_data()	// 在窗口加载的时候，调用登陆，并且请求
                 );
             }
 
+            // 有的不能在这里编辑is_chain_leader
+            for (var i = 0; i < jsonobj['data'].length; i++) {
+                var this_row = jsonobj['data'][i];
+
+                if (this_row.is_chain_leader) {
+                    $("#edit_channel_buttion_{rowid}".format(this_row)).hide();
+                }
+
+            }
+
             setTimeout(update_data, 1300);
         }
     });
@@ -229,11 +239,11 @@ function submit_channel_detail_change(server_id, channel_id, source_url, is_enab
     });
 }
 
-function edit_channel_detail(server_id, channel_id, source_url, is_enable, url_type)
+function edit_channel_detail(server_id, channel_id, source_url, is_enable, is_chain_leader)
 {
     jQuery("#edit_channel_dialog #source_url").val('');
     jQuery("#edit_channel_dialog #channel_id").val(channel_id);
-    if (url_type == 0) {
+    if (!is_chain_leader) {
         $('#radio_source_url').prop('checked', true);
         jQuery("#edit_channel_dialog #source_url").val(source_url);
     }else
