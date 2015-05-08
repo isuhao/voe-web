@@ -23,7 +23,7 @@ var tr_template = '<tr class="success" id="trid{rowid}">\
         <td id="tdid_{rowid}_8">\
           <!-- Split button -->\
         <div class="btn-group">\
-            <button type="button" id="edit_channel_buttion_{rowid}" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="edit_channel_detail({server_id},{channel_id},\'{source_url}\', {is_enable}, {is_chain_leader});">编辑</button>\
+            <button type="button" id="edit_channel_buttion_{rowid}" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="show_edit_channel({rowid}, {server_id},{channel_id});">编辑</button>\
             <a type="button" class="btn btn-info" href="channel_flow.html?channel_id={channel_id}" target="_blank">查看频道流转</a>\
             <button type="button" class="btn btn-info" onclick="dettach_channel({server_id},{channel_id})">删除频道</button>\
         </div>\
@@ -134,6 +134,8 @@ function update_data()	// 在窗口加载的时候，调用登陆，并且请求
 
             $('#curPage_indicator').html('当前第{curPage}页, 共{pageCount}页'.format(jsonobj));
 
+            window.current_data = jsonobj['data'];
+
             if (table_length != jsonobj['data'].length)
                 full_table_populate(jsonobj['data']);
 
@@ -205,127 +207,25 @@ function update_title()
 
 };
 
-function submit_channel_detail_change(server_id, channel_id, source_url, is_enable)
+function show_edit_channel(rowid, server_id, channel_id)
 {
-    console.log('submit_channel_detail_change sourceurl :');
 
-    var submitdata = {'server_id':window.server_id|0, 'channel_id':0, 'source_url':'', 'cache_size':0, 'is_enable': true};
-
-    submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() |0;
-    if (jQuery('#edit_channel_dialog #radio_source_url').prop('checked')) {
-        submitdata['source_url'] = jQuery('#edit_channel_dialog #source_url').val();
-    }else{
-        var fmt = {'protocol':'udp', 'server_id': jQuery('#edit_channel_dialog #source_server_id').val()};
-        if (jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked'))
-        {
-            fmt.protocol = 'http';
-        }
-
-        submitdata['source_url'] = '{protocol}://{server_id}'.format(fmt);
-    }
-    submitdata['cache_size'] = 1024 * (jQuery('#edit_channel_dialog #cache_size').val() |0);
-    submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
-
-    submit_mod_attched_channel(submitdata, function (retcode, msg)
-    {
-        if (retcode == 0)
-        {
-            window.location = '';
-        }
-        else
-        {
-            alert('添加失败 : ' + msg);
-        }
-    });
-}
-
-function edit_channel_detail(server_id, channel_id, source_url, is_enable, is_chain_leader)
-{
-    jQuery("#edit_channel_dialog #source_url").val('');
     jQuery("#edit_channel_dialog #channel_id").val(channel_id);
-    if (!is_chain_leader) {
-        $('#radio_source_url').prop('checked', true);
-        jQuery("#edit_channel_dialog #source_url").val(source_url);
-    }else
-    {
-        $('#radio_source_server_id').prop('checked', true);
-        radio2_changed($('#source_url'), $('.source_server_id_class'));
-
-        var ii = source_url.indexOf('://');
-
-        var protocol = source_url.substr(0, ii);
-
-        var sid = source_url.substr(ii + 3);
-
-        jQuery('#edit_channel_dialog #source_server_id').val(sid);
-
-        if (protocol == 'udp')
-        {
-            jQuery('#edit_channel_dialog #source_server_protocol_udp').prop('checked', true)
-        }else
-        {
-            jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked', true)
-        }
-
-        var fmt = {'protocol':'udp', 'server_id': jQuery('#edit_channel_dialog #source_server_id').val()};
-        if (jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked'))
-        {
-            fmt.protocol = 'http';
-        }
-    }
     jQuery("#edit_channel_dialog #channel_id").prop('readonly', true);
-    jQuery('#edit_channel_dialog #is_enable').prop("checked", is_enable);
+
+    jQuery('#edit_channel_dialog #upstream_server_id').val(window.current_data[rowid].upstream_server_id);
+
+
+    if (window.current_data[rowid].upstream_protocol == 'udp') {
+        jQuery('#edit_channel_dialog #source_server_protocol_udp').prop('checked', true)
+    } else {
+        jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked', true)
+    }
+
+    jQuery('#edit_channel_dialog #is_enable').prop("checked", window.current_data[rowid].is_enable);
 
     jQuery("#channel_model_dialog_submit_buttion").unbind('click');
-    jQuery("#channel_model_dialog_submit_buttion").click(function ()
-    {
-        var surl = '';
-        if (jQuery('#edit_channel_dialog #radio_source_url').prop('checked')) {
-            surl = jQuery('#edit_channel_dialog #source_url').val();
-        }else{
-            var fmt = {'protocol':'udp', 'server_id': jQuery('#edit_channel_dialog #source_server_id').val()};
-            if (jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked'))
-            {
-                fmt.protocol = 'http';
-            }
-
-            surl = '{protocol}://{server_id}'.format(fmt);
-        }
-        submit_channel_detail_change(server_id,channel_id, surl, jQuery('#edit_channel_dialog #is_enable').prop("checked"));
-    });
-}
-
-function attach_channel()
-{
-    console.log('add_channel sourceurl :');
-
-    var submitdata = {
-        'server_id': window.server_id | 0,
-        'channel_id': 0,
-        'upstream_server_id': 0,
-        'cache_size': 0,
-        'is_enable': true
-    };
-
-    submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() |0;
-    submitdata['upstream_server_id'] = jQuery('#edit_channel_dialog #upstream_server_id').val() | 0;
-    submitdata.upstream_protocol = "udp";
-
-    if (jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked')) {
-        submitdata.upstream_protocol = "http";
-    }
-
-    submitdata['cache_size'] = 1024* ( jQuery('#edit_channel_dialog #cache_size').val() |0 );
-    submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
-
-    submit_attach_channel(submitdata, function (retcode, msg) {
-        if (retcode == 0) {
-            window.location = '';
-        }
-        else {
-            alert('添加失败 : ' + msg);
-        }
-    });
+    jQuery("#channel_model_dialog_submit_buttion").click(mod_attached_channel);
 }
 
 function  show_add_channel()
@@ -339,6 +239,69 @@ function  show_add_channel()
     jQuery("#channel_model_dialog_submit_buttion").unbind('click');
     jQuery("#channel_model_dialog_submit_buttion").click(attach_channel);
 }
+
+function attach_channel() {
+    var submitdata = {
+        'server_id': window.server_id | 0,
+        'channel_id': 0,
+        'upstream_server_id': 0,
+        'cache_size': 0,
+        'is_enable': true
+    };
+
+    submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() | 0;
+    submitdata['upstream_server_id'] = jQuery('#edit_channel_dialog #upstream_server_id').val() | 0;
+    submitdata.upstream_protocol = "udp";
+
+    if (jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked')) {
+        submitdata.upstream_protocol = "http";
+    }
+
+    submitdata['cache_size'] = 1024 * ( jQuery('#edit_channel_dialog #cache_size').val() | 0 );
+    submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
+
+    submit_attach_channel(submitdata, function (retcode, msg) {
+        if (retcode == 0) {
+            window.location = '';
+        }
+        else {
+            alert('添加失败 : ' + msg);
+        }
+    });
+}
+
+function mod_attached_channel() {
+    console.log('mod_attached_channel');
+
+    var submitdata = {
+        'server_id': window.server_id | 0,
+        'channel_id': 0,
+        'upstream_server_id': 0,
+        'cache_size': 0,
+        'is_enable': true
+    };
+
+    submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() | 0;
+    submitdata['upstream_server_id'] = jQuery('#edit_channel_dialog #upstream_server_id').val() | 0;
+    submitdata.upstream_protocol = "udp";
+
+    if (jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked')) {
+        submitdata.upstream_protocol = "http";
+    }
+
+    submitdata['cache_size'] = 1024 * ( jQuery('#edit_channel_dialog #cache_size').val() | 0 );
+    submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
+
+    submit_mod_attched_channel(submitdata, function (retcode, msg) {
+        if (retcode == 0) {
+            window.location = '';
+        }
+        else {
+            alert('修改失败 : ' + msg);
+        }
+    });
+}
+
 
 function dettach_channel(sid, cid)
 {
