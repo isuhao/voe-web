@@ -34,25 +34,22 @@ function show_add_channel() {
     $("#channel_model_dialog_submit_buttion").click(add_channel);
 }
 
-function submit_del_del_server(sid, success) {
-    var submitdata = {'server_id': sid | 0};
+function delete_channel(rowid, channel_id, num_channels) {
 
-    ajaxpost('api/del_server', submitdata, function (data) {
-        success(data['retcode']);
-    });
-}
+    var r = confirm("删除后不可恢复!");
 
-function del_server(sid, num_channels) {
-    if (num_channels == 0) {
-        submit_del_del_server(sid, function (retcode) {
-            // reload page
-            if (retcode) {
-                alert('失败');
-            }
-            window.location = '';
-        });
-    } else {
-        alert('先删除频道!');
+    if (r) {
+        if (num_channels < 2) {
+            submit_delete_channel(channel_id, function (retcode) {
+                // reload page
+                if (retcode) {
+                    alert('失败');
+                }
+                window.location = '';
+            });
+        } else {
+            alert('删除前线先');
+        }
     }
 }
 

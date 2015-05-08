@@ -15,7 +15,7 @@ var tr_template = '<tr class="success" id="trid{rowid}">\
             <td id="tdid_{rowid}_0">{is_enable_str}</td>\
             <td id="tdid_{rowid}_1">{server_id}</td>\
             <td id="tdid_{rowid}_2">{channel_id}</td>\
-            <td id="tdid_{rowid}_3">{source_url}</td>\
+            <td id="tdid_{rowid}_3">{source_url_auto}</td>\
             <td id="tdid_{rowid}_4">{bind_address}</td>\
             <td id="tdid_{rowid}_5">{updown_status.heath}</td>\
             <td id="tdid_{rowid}_6">{updown_status.upload_speed_auto}</td>\
@@ -25,7 +25,7 @@ var tr_template = '<tr class="success" id="trid{rowid}">\
         <div class="btn-group">\
             <button type="button" id="edit_channel_buttion_{rowid}" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="edit_channel_detail({server_id},{channel_id},\'{source_url}\', {is_enable}, {is_chain_leader});">编辑</button>\
             <a type="button" class="btn btn-info" href="channel_flow.html?channel_id={channel_id}" target="_blank">查看频道流转</a>\
-            <button type="button" class="btn btn-info" onclick="del_channel({server_id},{channel_id})">删除频道</button>\
+            <button type="button" class="btn btn-info" onclick="dettach_channel({server_id},{channel_id})">删除频道</button>\
         </div>\
         </td>\
         </tr>';
@@ -65,6 +65,14 @@ function prepare_template_data(thisrow)
     {
         thisrow.is_enable_str = "启用";
     }
+
+    if (thisrow.is_chain_leader) {
+        thisrow.source_url_auto = thisrow.source_url;
+    }
+    else {
+        thisrow.source_url_auto = '用{1}从<a href="detail.html?server_id={0}">服务器{0}</a>拉取'.format(thisrow.upstream_server_id, thisrow.upstream_protocol);
+    }
+
     return thisrow;
 }
 
@@ -188,7 +196,7 @@ function update_title()
                 jsonobj.server_ip = format_ip(jsonobj['ip']);
             }
 
-            $("#table_title").html('SERVER_ID={1} 服务器详细情况({0})'.format(jsonobj.server_ip, server_id));
+            $("#table_title").html('SERVER_ID={1} 服务器详细情况({0} tcpport : {2} udpport :{3})'.format(jsonobj.server_ip, server_id, jsonobj.tport, jsonobj.uport));
 
             setTimeout(update_title, 9900);
 
@@ -196,14 +204,6 @@ function update_title()
     });
 
 };
-
-function submit_mod_channel(submitdata, success)
-{
-    ajaxpost('api/mod_channel', submitdata, function(data)
-    {
-        success(data['retcode'], data['error_msg']);
-    });
-}
 
 function submit_channel_detail_change(server_id, channel_id, source_url, is_enable)
 {
@@ -226,7 +226,7 @@ function submit_channel_detail_change(server_id, channel_id, source_url, is_enab
     submitdata['cache_size'] = 1024 * (jQuery('#edit_channel_dialog #cache_size').val() |0);
     submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
 
-    submit_mod_channel(submitdata, function(retcode, msg)
+    submit_mod_attched_channel(submitdata, function (retcode, msg)
     {
         if (retcode == 0)
         {
@@ -295,37 +295,30 @@ function edit_channel_detail(server_id, channel_id, source_url, is_enable, is_ch
     });
 }
 
-function submit_add_channel(submitdata, success)
-{
-    ajaxpost('api/add_channel', submitdata, function(data)
-    {
-        success(data['retcode'], data['error_msg']);
-    });
-}
-
-function add_channel()
+function attach_channel()
 {
     console.log('add_channel sourceurl :');
 
-    var submitdata = {'server_id':window.server_id|0, 'channel_id':0, 'source_url':'', 'cache_size':0, 'is_enable': true};
+    var submitdata = {
+        'server_id': window.server_id | 0,
+        'channel_id': 0,
+        'upstream_server_id': 0,
+        'cache_size': 0,
+        'is_enable': true
+    };
 
     submitdata['channel_id'] = jQuery('#edit_channel_dialog #channel_id').val() |0;
+    submitdata['upstream_server_id'] = jQuery('#edit_channel_dialog #upstream_server_id').val() | 0;
+    submitdata.upstream_protocol = "udp";
 
-    if (jQuery('#edit_channel_dialog #radio_source_url').prop('checked')) {
-        submitdata['source_url'] = jQuery('#edit_channel_dialog #source_url').val();
-    }else{
-        var fmt = {'protocol':'udp', 'server_id': jQuery('#edit_channel_dialog #source_server_id').val()};
-        if (jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked'))
-        {
-            fmt.protocol = 'http';
-        }
-
-        submitdata['source_url'] = '{protocol}://{server_id}'.format(fmt);
+    if (jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked')) {
+        submitdata.upstream_protocol = "http";
     }
+
     submitdata['cache_size'] = 1024* ( jQuery('#edit_channel_dialog #cache_size').val() |0 );
     submitdata['is_enable'] = jQuery('#edit_channel_dialog #is_enable').prop("checked");
 
-    submit_add_channel(submitdata, function(retcode,msg) {
+    submit_attach_channel(submitdata, function (retcode, msg) {
         if (retcode == 0) {
             window.location = '';
         }
@@ -338,25 +331,18 @@ function add_channel()
 function  show_add_channel()
 {
     jQuery("#edit_channel_dialog #channel_id").val('');
-    jQuery("#edit_channel_dialog #source_url").val('');
+    jQuery("#edit_channel_dialog #source_server_id").val('');
+    jQuery("#edit_channel_dialog #bind_address").val('');
+    jQuery("#edit_channel_dialog #source_server_protocol_udp").prop('checked', true);
+
     jQuery("#edit_channel_dialog #channel_id").prop('readonly', false);
     jQuery("#channel_model_dialog_submit_buttion").unbind('click');
-    jQuery("#channel_model_dialog_submit_buttion").click(add_channel);
+    jQuery("#channel_model_dialog_submit_buttion").click(attach_channel);
 }
 
-function submit_del_channel(sid, cid, success)
+function dettach_channel(sid, cid)
 {
-    var submitdata = { 'server_id': sid|0, 'channel_id': cid|0 };
-
-    ajaxpost('api/del_channel', submitdata, function(data)
-    {
-        success(data['retcode']);
-    });
-}
-
-function del_channel(sid, cid)
-{
-    submit_del_channel(sid, cid, function (retcode)
+    submit_dettach_channel(sid, cid, function (retcode)
     {
         // reload page
         if (retcode)
@@ -373,7 +359,7 @@ window.real_ready = function()
 {
     update_title();
     update_data();
-}
+};
 
 function radio2_changed(t1, t2)
 {
