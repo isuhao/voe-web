@@ -30,7 +30,7 @@ function submit_attach_channel(submitdata, success) {
 }
 
 function submit_mod_attched_channel(submitdata, success) {
-    ajaxpost('api/mod_channel', submitdata, function (data) {
+    ajaxpost('api/mod_attached_channel', submitdata, function (data) {
         success(data['retcode'], data['error_msg']);
     });
 }
