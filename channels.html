@@ -71,62 +71,8 @@
         </div>
     </div>
     <!-- Modal -->
-    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Are you sure you want to sign out?</h4>
-                </div>
-                <div class="modal-footer">
-                    <a href="sign-in.html" class="btn btn-primary">Yes</a>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal - edit dialog -->
-    <div class="modal fade" id="edit_channel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">频道设置</h4>
-                </div>
-                <div >
-                    <table class="table table-striped table-hover table-bordered">
-                        <tbody id="edit_channel_dialog">
-                        <tr>
-                            <td><p class="table-left-td">频道ID: </p></td> <td ><input id="channel_id" type="number" placeholder="频道id, 是个数字" /></td>
-                        </tr>
-                        <tr>
-                            <td><p class="table-left-td">频道名称: </p></td> <td ><input id="channel_name" placeholder="频道名字, 比如 CCTV-5" /></td>
-                        </tr>
-                        <tr>
-                            <td><p class="table-left-td">上游url:</p></td>
-                            <td><input id="source_url" type="url" placeholder="从哪里拉流"/></td>
-                        </tr>
-                        <tr>
-                            <td><p class="table-left-td">拉流服务器:</p></td>
-                            <td><input id="source_server_id" type="number" placeholder="使用哪台服务器拉流?"/></td>
-                        </tr>
-                        <tr>
-                            <td><p class="table-left-td">缓冲大小: </p></td>
-                            <td><input id="cache_size" value="65536"/></td>
-                        </tr>
-                        <tr>
-                            <td><p class="table-left-td">启用 </p></td> <td ><input type="checkbox" id="is_enable" value="is_enable" checked /></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"  id="channel_model_dialog_submit_buttion">提交</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="modal-dialogs"></div>
+
     <footer class="templatemo-footer">
         <div class="templatemo-copyright">
             <p>Copyright &copy; 2015 <a href="#" target="_blank">VOE管理平台</a></p>
@@ -137,124 +83,27 @@
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/check_login.js"></script>
 <script type="text/javascript" src="js/voeapi.js"></script>
-<script type="text/javascript" src="channels.js"></script>
-
 <script type="text/javascript">
-
     format.extend(String.prototype);
-
     window.curpage = $.getUrlParam('curpage');
     if (window.curpage == null)
     {
         window.curpage = 1;
     }
     window.curpage = window.curpage |0;
-
-    $('#curPage_indicator').html('当前第{0}页, 正在加载, 请稍后......'.format(window.curpage));
-
-    var tr_template = '<tr class="success">\
-                <td></td>\
-                <td>{channel_id}</td>\
-                <td>{channel_name}</td>\
-                <td>{channel_source_url}</td>\
-                <td><a href="detail.html?server_id={channel_source_server_id}" style="width: 100%">{channel_source_server_id}</a></td>\
-                <td>{channel_servers}</td>\
-        <td>\
-          <!-- Split button -->\
-        <div class="btn-group">\
-            <a type="button" class="btn btn-info" href="channel_flow.html?channel_id={channel_id}" target="_blank">详情</a>\
-            <button type="button" id="edit_channel_buttion_{rowid}" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" \
-                onclick="show_edit_channel({rowid}, {channel_id})">编辑</button>\
-            <button type="button" class="btn btn-info" onclick="delete_channel({rowid}, {channel_id}, {channel_servers})">删除</button>\
-        </div>\
-        </td>\
-        </tr>';
-
     window.current_data = {};
-
-    window.real_ready = function()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
-    {
-        $('#prepage').hide();
-        $('#nextpage').hide();
-
-        if (window.curpage > 1) {
-            $('#prepage').prop('href', 'channels.html?curpage={0}'.format((window.curpage | 0) - 1));
-            $('#prepage').show();
-        }
-
-        var page_size = 20;
-
-        $.ajax({
-            type : "POST",
-            url : "api/get_channels",
-            data : "pageSize=20&curPage=" + window.curpage,
-            success : function(data)	// 获取服务器状态数据.
-            {
-                var jsonobj = eval(data);
-
-                console.log("success status: " + jsonobj["success"]);
-                console.log("length: " + jsonobj["data"].length);
-
-                if (window.curpage < jsonobj["pageCount"]) {
-                    $('#nextpage').show();
-                    $('#nextpage').prop('href', 'channels.html?curpage={0}'.format((window.curpage | 0) + 1));
-                }
-
-                $('#curPage_indicator').html('当前第{curPage}页, 共{pageCount}页'.format(jsonobj));
-
-                window.current_data = jsonobj["data"];
-
-                for (var i = 0; i < jsonobj["data"].length; i++)
-                {
-                    var rowdata = jsonobj["data"][i];
-                    rowdata.rowid = i;
-
-                    if (rowdata.channel_name == null)
-                    {
-                        rowdata.channel_name = "未设定";
-                    }
-
-                    var newtr = tr_template.format(rowdata);
-
-                    $("#the_table_body").append(newtr);
-
-
-                }
-            }
-        });
-    };
-
-    function format_ip(ips)
-    {
-        var r= '';
-        for(var i =0; i < ips.length; i++)
-        {
-            if (r=='')
-            {
-
-            }
-            else
-            {
-                r += ', ';
-            }
-            r += ips[i];
-        }
-
-        return r;
-    }
-
-    function goto_server_detail(server_id)
-    {
-        window.location = 'detail.html?server_id=' + server_id;
-    }
+    $('#curPage_indicator').html('当前第{0}页, 正在加载, 请稍后......'.format(window.curpage));
 </script>
 </body>
+
+<script type="text/javascript" src="channels.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/templatemo_script.js"></script>
 <script type="text/javascript">
 
     window.current_nav_page = 'nav-li-channels';
     $("#nav-bar").load("nav.html");
+    $("#modal-dialogs").load("modal-dialogs.html");
 
     $(document).ready(function(){
         ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);
