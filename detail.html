@@ -39,35 +39,7 @@
     </div>
 </div>
 <div class="template-page-wrapper">
-    <div class="navbar-collapse collapse templatemo-sidebar">
-        <ul class="templatemo-sidebar-menu">
-            <li>
-                <!--             <form class="navbar-form">
-                              <input type="text" class="form-control" id="templatemo_search_box" placeholder="Search...">
-                              <span class="btn btn-default">Go</span>
-                            </form> -->
-            </li>
-            <!--
-                      <li class="active"><a href="#"><i class="fa fa-home"></i>Dashboard</a></li>
-                      <li class="sub open">
-                        <a href="javascript:;">
-                          <i class="fa fa-database"></i> Nested Menu <div class="pull-right"><span class="caret"></span></div>
-                        </a>
-                        <ul class="templatemo-submenu">
-                          <li><a href="#">Aenean</a></li>
-                          <li><a href="#">Pellentesque</a></li>
-                          <li><a href="#">Congue</a></li>
-                          <li><a href="#">Interdum</a></li>
-                          <li><a href="#">Facilisi</a></li>
-                        </ul>
-                      </li>
-             -->
-            <li  class="active"><a href="index.html"><i class="fa fa-cubes"></i>服务器频道管理</a></li>
-            <li><a href="channels.html"><i class="fa fa-map-marker"></i>频道管理</a></li>
-            <!-- <li><a href="tables.html"><i class="fa fa-users"></i>操作员管理</a></li> -->
-            <!-- <li><a href="preferences.html"><i class="fa fa-cog"></i>Preferences</a></li> -->
-            <li><a href="javascript:;" data-toggle="modal" data-target="#confirmModal"><i class="fa fa-sign-out"></i>退出</a></li>
-        </ul>
+    <div class="navbar-collapse collapse templatemo-sidebar" id="nav-bar">
     </div><!--/.navbar-collapse -->
 
     <div class="templatemo-content-wrapper" style="height:1080px">
@@ -177,6 +149,10 @@
 <script type="text/javascript" src="js/check_login.js"></script>
 <script type="text/javascript" src="detail.js"></script>
 <script type="text/javascript">
+
+    window.current_nav_page = 'nav-li-managment';
+    $("#nav-bar").load("nav.html");
+
     jQuery(document).ready(function(){
         ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);
     });
