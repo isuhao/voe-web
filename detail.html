@@ -134,8 +134,17 @@
                             <tr>
                                 <td class="table-left-td">上游传输服务器: </td>
                                 <td>
-                                    <input class="source_server_id_class" id="upstream_server_id"
-                                           name="source_server_id" placeholder="填写服务器id"/>
+                                    <div   style="position:relative;">
+      <span   style="margin-left:100px;width:100%;height: 20px; overflow:hidden;">
+            <select   style="width:100%;margin-left:-100px"   onchange="option_set_server_id(this);" id="server_id_select_list">
+                <option   value=''></option>
+                <option   value='测试'>测试'</option>
+            </select>
+     </span>             <input style="height: 20px; width:90%;position:absolute;top: 0px; left:0px;" class="source_server_id_class"
+                                               id="upstream_server_id" name="source_server_id" placeholder="填写服务器id"/>
+                                    </div>
+
+
                                 </td>
                             </tr>
                             <tr>

@@ -106,6 +106,36 @@ function update_or_no_touch_dom_html(dom, content)
     }
 }
 
+function option_set_server_id( opt)
+{
+    $("#upstream_server_id").val(opt.value);
+}
+
+function update_server_list()
+{
+    $.ajax({
+        type : "POST",
+        url : "api/grid_server_status",
+        data : 'pageSize=1000&curPage=1',
+        success : function(data)	// 获取服务器状态数据.
+        {
+            var jsonobj = eval(data);
+
+            var optionlist = '<option   value=""></option>';
+
+            for (var i = 0; i < jsonobj["data"].length; i++)
+            {
+//                window.server_list[i] = jsonobj["data"][i].server_id;
+
+                optionlist += '<option value="{0}">{0}</option>\n'.format(jsonobj["data"][i].server_id);
+            }
+            $("#server_id_select_list").html(optionlist);
+//            alert(optionlist);
+         //   $("#upstream_server_id").html(optionlist);
+        }
+    });
+}
+
 function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
 {
     var server_id = $.getUrlParam('server_id');
@@ -322,6 +352,7 @@ window.real_ready = function()
 {
     update_title();
     update_data();
+    update_server_list();
 };
 
 function radio2_changed(t1, t2)
@@ -329,3 +360,5 @@ function radio2_changed(t1, t2)
     t1.prop('disabled', 'disabled');
     t2.prop('disabled', '');
 }
+
+window.server_list = {};
