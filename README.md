@@ -1,11 +1,11 @@
 
 # voe-web
 
-voe-web ÊÇ voe-core µÄ web Ç°¶Ë.
+voe-web æ˜¯ voe-core çš„ web å‰ç«¯.
 
-# ²¿Êğ°ì·¨
+# éƒ¨ç½²åŠæ³•
 
-½âÑ¹²¢ÅäÖÃ nginx µÄ root µ½½âÑ¹Â·¾¶
+è§£å‹å¹¶é…ç½® nginx çš„ root åˆ°è§£å‹è·¯å¾„
 
-È»ºóÅäÖÃ nginx ×ª·¢ /api/ Â·¾¶ÏÂµÄÇëÇóµ½ voesirdar µÄ http_server ¡£
+ç„¶åé…ç½® nginx è½¬å‘ /api/ è·¯å¾„ä¸‹çš„è¯·æ±‚åˆ° voesirdar çš„ http_server ã€‚
 
