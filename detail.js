@@ -23,7 +23,7 @@ var tr_template = '<tr class="success" id="trid{rowid}">\
         <td id="tdid_{rowid}_8">\
           <!-- Split button -->\
         <div class="btn-group">\
-            <button type="button" id="edit_channel_buttion_{rowid}" class="btn btn-info" data-toggle="modal" data-target="#edit_channel" onclick="show_edit_channel({rowid}, {server_id},{channel_id});">编辑</button>\
+            <button type="button" id="edit_channel_buttion_{rowid}" class="btn btn-info" data-toggle="modal" data-target="#edit_server_channel" onclick="show_edit_channel({rowid}, {server_id},{channel_id});">编辑</button>\
             <a type="button" class="btn btn-info" href="channel_flow.html?channel_id={channel_id}" target="_blank">查看频道流转</a>\
             <button type="button" class="btn btn-info" onclick="dettach_channel({server_id},{channel_id})">删除频道</button>\
         </div>\
@@ -240,34 +240,34 @@ function update_title()
 function show_edit_channel(rowid, server_id, channel_id)
 {
 
-    jQuery("#edit_channel_dialog #channel_id").val(channel_id);
-    jQuery("#edit_channel_dialog #channel_id").prop('readonly', true);
+    jQuery("#edit_server_channel #edit_channel_dialog #channel_id").val(channel_id);
+    jQuery("#edit_server_channel #edit_channel_dialog #channel_id").prop('readonly', true);
 
-    jQuery('#edit_channel_dialog #upstream_server_id').val(window.current_data[rowid].upstream_server_id);
+    jQuery('#edit_server_channel #edit_channel_dialog #upstream_server_id').val(window.current_data[rowid].upstream_server_id);
 
 
     if (window.current_data[rowid].upstream_protocol == 'udp') {
-        jQuery('#edit_channel_dialog #source_server_protocol_udp').prop('checked', true)
+        jQuery('#edit_server_channel #edit_channel_dialog #source_server_protocol_udp').prop('checked', true)
     } else {
-        jQuery('#edit_channel_dialog #source_server_protocol_tcp').prop('checked', true)
+        jQuery('#edit_server_channel #edit_channel_dialog #source_server_protocol_tcp').prop('checked', true)
     }
 
-    jQuery('#edit_channel_dialog #is_enable').prop("checked", window.current_data[rowid].is_enable);
+    jQuery('#edit_server_channel #edit_channel_dialog #is_enable').prop("checked", window.current_data[rowid].is_enable);
 
-    jQuery("#channel_model_dialog_submit_buttion").unbind('click');
-    jQuery("#channel_model_dialog_submit_buttion").click(mod_attached_channel);
+    jQuery("#edit_server_channel #channel_model_dialog_submit_buttion").unbind('click');
+    jQuery("#edit_server_channel #channel_model_dialog_submit_buttion").click(mod_attached_channel);
 }
 
 function  show_add_channel()
 {
-    jQuery("#edit_channel_dialog #channel_id").val('');
-    jQuery("#edit_channel_dialog #source_server_id").val('');
-    jQuery("#edit_channel_dialog #bind_address").val('');
-    jQuery("#edit_channel_dialog #source_server_protocol_udp").prop('checked', true);
+    jQuery("#edit_server_channel #channel_id").val('');
+    jQuery("#edit_server_channel #source_server_id").val('');
+    jQuery("#edit_server_channel #bind_address").val('');
+    jQuery("#edit_server_channel #source_server_protocol_udp").prop('checked', true);
 
-    jQuery("#edit_channel_dialog #channel_id").prop('readonly', false);
-    jQuery("#channel_model_dialog_submit_buttion").unbind('click');
-    jQuery("#channel_model_dialog_submit_buttion").click(attach_channel);
+    jQuery("#edit_server_channel #channel_id").prop('readonly', false);
+    jQuery("#edit_server_channel #channel_model_dialog_submit_buttion").unbind('click');
+    jQuery("#edit_server_channel #channel_model_dialog_submit_buttion").click(attach_channel);
 }
 
 function attach_channel() {

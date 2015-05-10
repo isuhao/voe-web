@@ -5,7 +5,12 @@ function on_check_login_return(data)
 
     window.login_ok = result.is_login;
 
-    if (!result.is_login)
+
+    if (result.no_license)
+    {
+        window.location = 'setup.html';
+    }
+    else if (!result.is_login)
     {
         window.location = 'sign-in.html';
     }else
