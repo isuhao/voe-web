@@ -113,27 +113,25 @@ function option_set_server_id( opt)
 
 function update_server_list()
 {
-    $.ajax({
-        type : "POST",
-        url : "api/grid_server_status",
-        data : 'pageSize=1000&curPage=1',
-        success : function(data)	// 获取服务器状态数据.
+    get_server_list(
+        function (server_list)
         {
-            var jsonobj = eval(data);
-
             var optionlist = '<option   value=""></option>';
+            optionlist = '';
 
-            for (var i = 0; i < jsonobj["data"].length; i++)
+            for (var i = 0; i < server_list.length; i++)
             {
-//                window.server_list[i] = jsonobj["data"][i].server_id;
-
-                optionlist += '<option value="{0}">{0}</option>\n'.format(jsonobj["data"][i].server_id);
+                optionlist += '<option value="{0}">{0}</option>\n'.format(server_list[i]);
             }
             $("#server_id_select_list").html(optionlist);
-//            alert(optionlist);
-         //   $("#upstream_server_id").html(optionlist);
+            $("#upstream_server_id").html(optionlist);
+            $("#server_id_list").html(optionlist);
+
+            if (window.server_id == 0) {
+                window.location = "detail.html?server_id=" + server_list[0];
+            }
         }
-    });
+    );
 }
 
 function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。

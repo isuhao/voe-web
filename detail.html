@@ -50,6 +50,14 @@
             </ol>
             <div class="templatemo-panels" style="height:999px">
                 <h4 class="margin-bottom-15" id="table_title">服务器详细情况</h4>
+
+                <div>
+                    <p style="display: inline;">选择其他服务器</p>
+                    <select class="fa-search" id="server_id_list"
+                            onchange="window.location = 'detail.html?server_id=' + this.value">
+                    </select>
+                </div>
+
                 <span style="display: inline" id="curPage_indicator"></span>
                 <table class="table table-striped table-hover table-bordered">
                     <thead>
@@ -91,9 +99,10 @@
 <script type="text/javascript" src="detail.js"></script>
 <script type="text/javascript">
 
-    window.current_nav_page = 'nav-li-managment';
+    window.current_nav_page = 'nav-li-servers';
     $("#nav-bar").load("nav.html");
     $("#modal-dialogs").load("modal-dialogs.html");
+
 
     jQuery(document).ready(function(){
         ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);

@@ -42,3 +42,30 @@ function submit_dettach_channel(sid, cid, success) {
         success(data['retcode']);
     });
 }
+
+//
+
+function grid_server_status(callback) {
+    $.ajax({
+        type: "POST",
+        url: "api/grid_server_status",
+        data: 'pageSize=1000&curPage=1',
+        success: function (data)	// 获取服务器状态数据.
+        {
+            var jsonobj = eval(data);
+            callback(jsonobj);
+        }
+    });
+}
+
+function get_server_list(callback) {
+    var server_list = [];
+    grid_server_status(function (jsonobj) {
+            for (var i = 0; i < jsonobj["data"].length; i++) {
+                server_list[i] = jsonobj["data"][i].server_id;
+            }
+
+            callback(server_list);
+        }
+    );
+}
