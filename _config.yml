@@ -1,0 +1,18 @@
+auto:   true
+server: true
+
+
+name: CppScript, Inc
+url: http://cppscript.org
+description: CPP Scrpit, Inc
+
+permalink: date
+pygments: true
+markdown: rdiscount
+baseurl: /
+
+domain: cppscript.com
+
+source: .
+destination: pub
+plugins: ./_plugins
