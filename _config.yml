@@ -14,5 +14,5 @@ baseurl: /
 domain: cppscript.com
 
 source: .
-destination: /srv/www/htdocs
+destination: pub
 plugins: ./_plugins
