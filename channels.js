@@ -87,6 +87,7 @@ function mod_channel(rowid, channel_id) {
 function show_edit_channel(rowid, channel_id) {
     $("#edit_channel_modal_dialog #edit_channel_dialog #channel_id").val(channel_id);
     $("#edit_channel_modal_dialog #edit_channel_dialog #channel_name").val(window.current_data[rowid].channel_name);
+    jQuery('#edit_channel_modal_dialog #edit_channel_dialog #cache_size').val(window.current_data[rowid].cache_size);
 
     $('#edit_channel_modal_dialog #edit_channel_dialog #source_url').val(window.current_data[rowid].channel_source_url);
     $('#edit_channel_modal_dialog #edit_channel_dialog #is_enable').prop('checked', window.current_data[rowid].is_enable);

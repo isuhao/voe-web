@@ -6,6 +6,11 @@
     <meta name="keywords" content="" />
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width">
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="js/check_login.js"></script>
+    <script type="text/javascript" src="js/voeapi.js"></script>
+
     <link rel="stylesheet" href="css/templatemo_main.css">
     <script type="text/javascript" src="js/string-format.js"></script>
     <link rel="stylesheet" href="css/tables.css">
@@ -74,15 +79,9 @@
     <div id="modal-dialogs"></div>
 
     <footer class="templatemo-footer">
-        <div class="templatemo-copyright">
-            <p>Copyright &copy; 2015 <a href="#" target="_blank">VOE管理平台</a></p>
-        </div>
     </footer>
 </div>
-<script src="js/jquery.min.js"></script>
-<script type="text/javascript" src="js/common.js"></script>
-<script type="text/javascript" src="js/check_login.js"></script>
-<script type="text/javascript" src="js/voeapi.js"></script>
+</body>
 <script type="text/javascript">
     format.extend(String.prototype);
     window.curpage = $.getUrlParam('curpage');
@@ -94,17 +93,11 @@
     window.current_data = {};
     $('#curPage_indicator').html('当前第{0}页, 正在加载, 请稍后......'.format(window.curpage));
 </script>
-</body>
-
 <script type="text/javascript" src="channels.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/templatemo_script.js"></script>
+<script type="text/javascript" src="voe-stdafx.js"></script>
 <script type="text/javascript">
-
-    window.current_nav_page = 'nav-li-channels';
-    $("#nav-bar").load("nav.html");
-    $("#modal-dialogs").load("modal-dialogs.html");
-
     $(document).ready(function(){
         ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);
     });

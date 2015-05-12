@@ -116,7 +116,7 @@ function update_server_list()
     get_server_list(
         function (server_list)
         {
-            var optionlist = '<option   value=""></option>';
+            var optionlist = '<option value=""></option>';
             optionlist = '';
 
             for (var i = 0; i < server_list.length; i++)
@@ -129,6 +129,10 @@ function update_server_list()
 
             if (window.server_id == 0) {
                 window.location = "detail.html?server_id=" + server_list[0];
+            }
+            else
+            {
+                $("#server_id_list").prop('value' ,window.server_id);
             }
         }
     );
@@ -242,7 +246,7 @@ function show_edit_channel(rowid, server_id, channel_id)
     jQuery("#edit_server_channel #edit_channel_dialog #channel_id").prop('readonly', true);
 
     jQuery('#edit_server_channel #edit_channel_dialog #upstream_server_id').val(window.current_data[rowid].upstream_server_id);
-
+    jQuery('#edit_server_channel #edit_channel_dialog #cache_size').val(window.current_data[rowid].cache_size);
 
     if (window.current_data[rowid].upstream_protocol == 'udp') {
         jQuery('#edit_server_channel #edit_channel_dialog #source_server_protocol_udp').prop('checked', true)

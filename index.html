@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="css/templatemo_main.css">
     <script type="text/javascript" src="js/string-format.js"></script>
-    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/common.js"></script>
     <script type="text/javascript" src="js/check_login.js"></script>
 
@@ -85,11 +85,7 @@
     </div>
     <div id="modal-dialogs">
     </div>
-    <footer class="templatemo-footer">
-        <div class="templatemo-copyright">
-            <p>Copyright &copy; 2015 <a href="#" target="_blank">VOE管理平台</a></p>
-        </div>
-    </footer>
+    <footer class="templatemo-footer" />
 </div>
 
 <script type="text/javascript">
@@ -193,8 +189,6 @@
 
     function show_mod_server(server_id, rowid, server_tcp_port, server_ucp_port)
     {
-        alert(rowid);
-
         var server_name = '';
 
         server_name = $("#rowid_{0} #server_name".format(rowid)).text();
@@ -311,13 +305,8 @@
 </body>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/templatemo_script.js"></script>
+<script type="text/javascript" src="voe-stdafx.js"></script>
 <script type="text/javascript">
-
-    window.current_nav_page = 'nav-li-managment';
-
-    $("#nav-bar").load("nav.html");
-    $("#modal-dialogs").load("modal-dialogs.html");
-
     $(document).ready(function(){
         ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);
     });
