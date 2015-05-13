@@ -70,7 +70,7 @@ function get_server_list(callback) {
     );
 }
 
-function submit_login(username, passowrd, callback)
+function submit_login(username, password, callback)
 {
     ajaxpost("api/do_login", {"username":username, "password": password}, on_login_return);
 }

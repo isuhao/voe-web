@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/templatemo_main.css">
     <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/common.js"></script>
+  <script type="text/javascript" src="js/voeapi.js"></script>
   <script type="text/javascript" src="js/check_login.js"></script>
 </head>
 <body>
@@ -59,3 +60,19 @@
 </div>
 </body>
 </html>
+
+<script>
+
+  function do_login()
+  {
+    var username = $("#username").val();
+    var password = $("#password").val();
+
+    alert(password);
+
+    submit_login(username, password, on_login_return);
+
+    return false;
+  }
+
+</script>
