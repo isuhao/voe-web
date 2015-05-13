@@ -113,7 +113,7 @@ function option_set_server_id( opt)
 
 function update_server_list(update_ready)
 {
-    get_server_list(function (_server_list)
+    submit_get_server_list(function (_server_list)
     {
         window.server_list = _server_list;
         var server_list = _server_list;

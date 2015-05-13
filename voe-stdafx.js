@@ -24,6 +24,6 @@ $('#' + window.current_nav_page).addClass("active");
 function voe_check_login()
 {
     $(document).ready(function(){
-        ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);
+        submit_check_login(on_check_login_return);
     });
 }

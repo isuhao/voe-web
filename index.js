@@ -1,14 +1,6 @@
 /**
  * Created by cai on 15-5-13.
  */
-function submit_add_server(submitdata, success)
-{
-    ajaxpost('api/add_server', submitdata, function(data)
-    {
-        success(data['retcode']);
-    });
-}
-
 function add_server()
 {
     console.log(
@@ -41,20 +33,11 @@ function show_add_server()
     $("#submit_dialog_data").click(add_server);
 }
 
-function submit_del_del_server(sid, success)
-{
-    var submitdata = { 'server_id': sid|0 };
-
-    ajaxpost('api/del_server', submitdata, function(data)
-    {
-        success(data['retcode']);
-    });
-}
 
 function del_server(sid, num_channels)
 {
     if (num_channels == 0) {
-        submit_del_del_server(sid, function (retcode) {
+        submit_delete_server(sid, function (retcode) {
             // reload page
             if (retcode) {
                 alert('失败');
@@ -67,13 +50,6 @@ function del_server(sid, num_channels)
     }
 }
 
-function submit_mod_server(submitdata, success)
-{
-    ajaxpost('api/mod_server', submitdata, function(data)
-    {
-        success(data['retcode']);
-    });
-}
 
 function mod_server(sid)
 {
@@ -156,50 +132,45 @@ window.real_ready = function()	// 在窗口加载的时候，调用登陆，并�
         $('#prepage').show();
     }
 
-    $.ajax({
-        type : "POST",
-        url : "api/grid_server_status",
-        data : 'pageSize={1}&curPage={0}'.format(window.curpage, page_size),
-        success : function(data)	// 获取服务器状态数据.
+    submit_grid_server_status(page_size, window.curpage, function(data)	// 获取服务器状态数据.
+    {
+        var jsonobj = eval(data);
+
+        console.log("success status: " + jsonobj["success"]);
+        console.log("length: " + jsonobj["data"].length);
+
+        if (window.curpage < jsonobj["pageCount"]) {
+            $('#nextpage').show();
+            $('#nextpage').prop('href', 'index.html?curpage={0}'.format((window.curpage | 0) + 1));
+        }
+
+        $('#curPage_indicator').html('当前第{curPage}页, 共{pageCount}页'.format(jsonobj));
+
+        for (var i = 0; i < jsonobj["data"].length; i++)
         {
-            var jsonobj = eval(data);
-
-            console.log("success status: " + jsonobj["success"]);
-            console.log("length: " + jsonobj["data"].length);
-
-            if (window.curpage < jsonobj["pageCount"]) {
-                $('#nextpage').show();
-                $('#nextpage').prop('href', 'index.html?curpage={0}'.format((window.curpage | 0) + 1));
-            }
-
-            $('#curPage_indicator').html('当前第{curPage}页, 共{pageCount}页'.format(jsonobj));
-
-            for (var i = 0; i < jsonobj["data"].length; i++)
+            jsonobj["data"][i].rowid = i;
+            if (jsonobj["data"][i]["ip"])
+                jsonobj["data"][i].server_ip = format_ip(jsonobj["data"][i]["ip"]);
+            else
+                jsonobj["data"][i].server_ip = '未在线';
+            // 循环插入表格.
+            var status = (jsonobj["data"][i]["status"]);
+            if( status < 0 )
             {
-                jsonobj["data"][i].rowid = i;
-                if (jsonobj["data"][i]["ip"])
-                    jsonobj["data"][i].server_ip = format_ip(jsonobj["data"][i]["ip"]);
-                else
-                    jsonobj["data"][i].server_ip = '未在线';
-                // 循环插入表格.
-                var status = (jsonobj["data"][i]["status"]);
-                if( status < 0 )
-                {
-                    jsonobj["data"][i]["status_str"] = "离线";
-                }
-                else if (status < 100)
-                {
-                    jsonobj["data"][i]["status_str"] = "在线-健康度 : " + status ;
-                }
-                else
-                {
-                    jsonobj["data"][i]["status_str"] = "在线-完美";
-                }
-
-                var newtr = tr_template.format(jsonobj["data"][i]);
-
-                $("#the_table_body").append(newtr);
+                jsonobj["data"][i]["status_str"] = "离线";
             }
+            else if (status < 100)
+            {
+                jsonobj["data"][i]["status_str"] = "在线-健康度 : " + status ;
+            }
+            else
+            {
+                jsonobj["data"][i]["status_str"] = "在线-完美";
+            }
+
+            var newtr = tr_template.format(jsonobj["data"][i]);
+
+            $("#the_table_body").append(newtr);
         }
     });
 };
