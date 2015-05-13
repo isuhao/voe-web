@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+    <title>VOE安装注册</title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="css/templatemo_main.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="js/check_login.js"></script>
+    <script type="text/javascript">
+
+        jQuery.ajax({
+            type : "GET",
+            url : "api/need_setup",
+            data: "",
+            success : function(data)
+            {
+                var server_return = data;
+
+                if (server_return == 0)
+                {
+                    window.location = "index.html";
+                }
+            }
+        });
+
+        jQuery.ajax({
+            type : "GET",
+            url : "api/product_id",
+            data: "",
+            success : function(data)
+            {
+                var product_id = data;
+
+                $("#product_id").val(product_id);
+            }
+        });
+
+    </script>
+</head>
+<body>
+<div id="main-wrapper">
+    <div class="navbar navbar-inverse" role="navigation">
+        <div class="navbar-header">
+            <div class="logo"><h1>VOE安装注册</h1></div>
+        </div>
+    </div>
+    <div class="template-page-wrapper">
+        <form class="form-horizontal templatemo-signin-form" role="form" action="javascript:;">
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <label class="col-sm-2 control-label">  </label>
+                    <span>
+                    请将产品 id 通知给VOE销售代表获取激活序列号.
+                    </span>
+                    <span>
+                        <tr id="error-code" style="color: red;"></tr>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label class="col-sm-2 control-label">product_id</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" id="product_id" readonly />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label class="col-sm-2 control-label">序列号:</label>
+                    <div class="col-sm-10">
+                        <input name="cdkey" class="form-control" id="cdkey" placeholder="序列号" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label class="col-sm-2 control-label">设定初始管理密码:</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="password" placeholder="Password" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input type="submit" value="开始使用!" class="btn btn-default" onclick="submit_cdkey()">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <footer class="templatemo-footer">
+        <script type="text/javascript">
+            $("footer .templatemo-footer").load('copyright.html');
+        </script>
+    </footer>
+</div>
+</body>
+
+<script type="text/javascript">
+    function submit_cdkey()
+    {
+        var cdkey = $("#cdkey").val();
+        var password = $("#password").val();
+
+        ajaxpost("api/do_cdkey", {"cdkey":cdkey, "password": password}, function(data)
+        {
+            var res = eval(data);
+            // 处理是否接受 CD-key
+            // 不接受就刷新.
+
+            if(res.license_ok)
+            {
+                window.location = 'license.html';
+            }else
+                $("#error-code").text('序列号不正确,请重新输入');
+        });
+        return false;
+    }
+</script>
+
+</html>
