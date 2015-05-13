@@ -1,87 +1,34 @@
-<!DOCTYPE html>
-<head>
-    <meta charset="utf-8">
-    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
-    <title>VOE - 管理平台</title>
-    <meta name="keywords" content="" />
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width">
-    <script src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/common.js"></script>
-    <script type="text/javascript" src="js/check_login.js"></script>
-    <script type="text/javascript" src="js/voeapi.js"></script>
+---
+layout: index
+title: 频道管理
+script: channels.js
+nav_page: nav-li-channels
+---
 
-    <link rel="stylesheet" href="css/templatemo_main.css">
-    <script type="text/javascript" src="js/string-format.js"></script>
-    <link rel="stylesheet" href="css/tables.css">
-    <style type="text/css">
-        .navbar-header a:link { color: darkgray; text-decoration: none;}
-        .navbar-header a:active { text-decoration:blink}
-        .navbar-header a:hover { text-decoration:underline;}
-        .navbar-header a:visited { text-decoration: none;}
+<h4 class="margin-bottom-15">频道列表</h4>
+<span style="display: inline" id="curPage_indicator"></span>
+<table class="table table-striped table-hover table-bordered">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>频道ID</th>
+        <th>频道名称</th>
+        <th>源url</th>
+        <th>源服务器ID</th>
+        <th>传输服务器数量</th>
+        <th>操作</th>
+    </tr>
+    </thead>
 
-        td input {
-            width: 100%;
-        }
-    </style>
-</head>
-<body>
-<div class="navbar navbar-inverse" role="navigation">
-    <div class="navbar-header">
-        <a href="index.html" class="logo" style="text-decoration: none"><h1>VOE - 管理平台</h1></a>
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-    </div>
-</div>
-<div class="template-page-wrapper">
-    <div class="navbar-collapse collapse templatemo-sidebar" id="nav-bar">
-    </div><!--/.navbar-collapse -->
+    <tbody id="the_table_body">
+    </tbody>
+</table>
+<button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel_modal_dialog"
+        onclick="show_add_channel()">添加频道
+</button>
+<a type="button" class="btn btn-info" id="prepage" >上一页</a>
+<a type="button" class="btn btn-info" id="nextpage" >下一页</a>
 
-    <div class="templatemo-content-wrapper" style="height:1080px">
-        <div class="templatemo-content">
-            <ol class="breadcrumb">
-                <li><a href="index.html">首页</a></li>
-                <li><a href="#">频道管理</a></li>
-            </ol>
-            <div class="templatemo-panels" style="height:999px">
-
-                <h4 class="margin-bottom-15">频道列表</h4>
-                <span style="display: inline" id="curPage_indicator"></span>
-                <table class="table table-striped table-hover table-bordered">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>频道ID</th>
-                        <th>频道名称</th>
-                        <th>源url</th>
-                        <th>源服务器ID</th>
-                        <th>传输服务器数量</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-
-                    <tbody id="the_table_body">
-                    </tbody>
-                </table>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit_channel_modal_dialog"
-                        onclick="show_add_channel()">添加频道
-                </button>
-                <a type="button" class="btn btn-info" id="prepage" >上一页</a>
-                <a type="button" class="btn btn-info" id="nextpage" >下一页</a>
-            </div>
-        </div>
-    </div>
-    <!-- Modal -->
-    <div id="modal-dialogs"></div>
-
-    <footer class="templatemo-footer">
-    </footer>
-</div>
-</body>
 <script type="text/javascript">
     format.extend(String.prototype);
     window.curpage = $.getUrlParam('curpage');
@@ -93,13 +40,4 @@
     window.current_data = {};
     $('#curPage_indicator').html('当前第{0}页, 正在加载, 请稍后......'.format(window.curpage));
 </script>
-<script type="text/javascript" src="channels.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/templatemo_script.js"></script>
-<script type="text/javascript" src="voe-stdafx.js"></script>
-<script type="text/javascript">
-    $(document).ready(function(){
-        ajaxpost("api/check_login",{"check_login":true}, on_check_login_return);
-    });
-</script>
-</html>
+

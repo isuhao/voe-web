@@ -126,6 +126,7 @@ var tr_template = '<tr class="success">\
 
 window.real_ready = function ()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
 {
+
     $('#prepage').hide();
     $('#nextpage').hide();
 
@@ -135,6 +136,7 @@ window.real_ready = function ()	// 在窗口加载的时候，调用登陆，并
     }
 
     var page_size = 20;
+
 
     submit_get_channel_list(1000, window.curpage, function (data) {
         var jsonobj = eval(data);

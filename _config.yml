@@ -1,18 +1,13 @@
-auto:   true
-server: true
-
-
 name: CppScript, Inc
-url: http://cppscript.org
+url: http://demo.bd2.tv
 description: CPP Scrpit, Inc
 
 permalink: date
-pygments: true
+highlighter: true
 markdown: rdiscount
-baseurl: /
 
 domain: cppscript.com
 
 source: .
-destination: pub
+destination: _site
 plugins: ./_plugins

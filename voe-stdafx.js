@@ -17,11 +17,9 @@ var pages = {
     {
         window.current_nav_page = pages[str];
     }
-
-    $("#nav-bar").load("nav.html");
-    $("#modal-dialogs").load("modal-dialogs.html");
-    $("footer").load('copyright.html');
 })();
+
+$('#' + window.current_nav_page).addClass("active");
 
 function voe_check_login()
 {
