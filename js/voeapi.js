@@ -1,10 +1,10 @@
 /**
  * Created by Jack on 2015/5/8.
  */
+var api_path_base = 'api/';
 
-var api_path_base = '///127.0.0.1:8840/';
-api_path_base = 'api/';
-api_path_base = '///115.199.97.9:8840/';
+if (window.location.hostname == "demo.bd2.tv")
+    api_path_base = '///beansoft163com.ddns.net:8840/';
 
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     options.crossDomain ={
