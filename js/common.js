@@ -12,16 +12,19 @@
 
 function ajaxpost(_url, jsondata, callback)
 {
-    jQuery.ajax({
+    jQuery.ajax(_url,{
         type : "POST",
-        url : _url,
         data : JSON.stringify(jsondata),
         success : function(data)
         {
             var server_return = eval(data);
 
             callback(server_return);
-        }
+        },
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true
     });
 }
 
