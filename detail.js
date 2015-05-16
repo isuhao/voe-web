@@ -147,15 +147,17 @@ function update_channel_list(update_ready)
     {
         var _channel_list = [{ id:0, name:"test" }];
         for (var i = 0; i < jsonobj["data"].length; i++) {
-            _channel_list[i].id = jsonobj["data"][i].channel_id;
-            _channel_list[i].name = jsonobj["data"][i].channel_name;
+            _channel_list[i] = {
+                id: jsonobj["data"][i].channel_id,
+                name : jsonobj["data"][i].channel_name
+            };
         }
         window.channel_list = _channel_list;
         var channel_list = _channel_list;
 
         var optionlist = '<option value=""></option>';
         optionlist = '';
-
+        
         for (var i = 0; i < channel_list.length; i++)
         {
             optionlist += '<option value="{0}" onclick="option_set_channel_id(this);">{0}({1})</option>\n'.format(
