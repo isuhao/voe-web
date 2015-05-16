@@ -106,10 +106,6 @@ function update_or_no_touch_dom_html(dom, content)
     }
 }
 
-function option_set_server_id( opt)
-{
-    $("#upstream_server_id").val(opt.value);
-}
 
 function update_server_list(update_ready)
 {
@@ -126,7 +122,7 @@ function update_server_list(update_ready)
             optionlist += '<option value="{0}">{0}</option>\n'.format(server_list[i]);
         }
         $("#server_id_select_list").html(optionlist);
-        $("#upstream_server_id").html(optionlist);
+//        $("#upstream_server_id").html(optionlist);
         $("#server_id_list").html(optionlist);
 
         if (window.server_id)
@@ -144,6 +140,30 @@ function update_server_list(update_ready)
     });
 }
 
+
+function update_channel_list(update_ready)
+{
+    submit_get_channel_list(1000, 1, function (jsonobj)
+    {
+        var _channel_list = [];
+        for (var i = 0; i < jsonobj["data"].length; i++) {
+            _channel_list[i] = jsonobj["data"][i].channel_id;
+        }
+        window.channel_list = _channel_list;
+        var channel_list = _channel_list;
+
+        var optionlist = '<option value=""></option>';
+        optionlist = '';
+
+        for (var i = 0; i < channel_list.length; i++)
+        {
+            optionlist += '<option value="{0}">{0}</option>\n'.format(channel_list[i]);
+        }
+        $("#channel_id_select_list").html(optionlist);
+
+        update_ready();
+    });
+}
 
 function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
 {
@@ -360,6 +380,7 @@ window.real_ready = function()
         }
     });
 
+    update_channel_list(function(){});
 };
 
 window.server_list = {};
