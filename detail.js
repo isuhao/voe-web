@@ -132,7 +132,7 @@ function update_server_list(update_ready)
         }
         else
         {
-            window.server_id = server_list[0];
+            window.server_id = server_list[0].id;
         }
         $("#server_id_list").prop('value', window.server_id);
 
