@@ -119,7 +119,7 @@ function update_server_list(update_ready)
 
         for (var i = 0; i < server_list.length; i++)
         {
-            optionlist += '<option value="{0}">{0}</option>\n'.format(server_list[i]);
+            optionlist += '<option value="{0}" onclick="option_set_channel_id(this);">{0}</option>\n'.format(server_list[i]);
         }
         $("#server_id_select_list").html(optionlist);
 //        $("#upstream_server_id").html(optionlist);
