@@ -119,7 +119,7 @@ function update_server_list(update_ready)
 
         for (var i = 0; i < server_list.length; i++)
         {
-            optionlist += '<option value="{0}">{0}</option>\n'.format(server_list[i]);
+            optionlist += '<option value="{0}">{0}({1})</option>\n'.format(server_list[i].id, server_list[i].name);
         }
         $("#server_id_select_list").html(optionlist);
 //        $("#upstream_server_id").html(optionlist);
@@ -145,9 +145,10 @@ function update_channel_list(update_ready)
 {
     submit_get_channel_list(1000, 1, function (jsonobj)
     {
-        var _channel_list = [];
+        var _channel_list = [{ id:0, name:"test" }];
         for (var i = 0; i < jsonobj["data"].length; i++) {
-            _channel_list[i] = jsonobj["data"][i].channel_id;
+            _channel_list[i].id = jsonobj["data"][i].channel_id;
+            _channel_list[i].name = jsonobj["data"][i].channel_name;
         }
         window.channel_list = _channel_list;
         var channel_list = _channel_list;
@@ -157,7 +158,10 @@ function update_channel_list(update_ready)
 
         for (var i = 0; i < channel_list.length; i++)
         {
-            optionlist += '<option value="{0}" onclick="option_set_channel_id(this);">{0}</option>\n'.format(channel_list[i]);
+            optionlist += '<option value="{0}" onclick="option_set_channel_id(this);">{0}({1})</option>\n'.format(
+                channel_list[i].id,
+                channel_list[i].name
+            );
         }
         $("#channel_id_select_list").html(optionlist);
 

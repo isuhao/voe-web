@@ -92,7 +92,10 @@ function submit_get_server_list(callback) {
     submit_grid_server_status(10000, 1, function (jsonobj)
     {
         for (var i = 0; i < jsonobj["data"].length; i++) {
-            server_list[i] = jsonobj["data"][i].server_id;
+            server_list[i] = {
+                id: jsonobj["data"][i].server_id,
+                name : jsonobj["data"][i].server_name
+            };
         }
 
         callback(server_list);
