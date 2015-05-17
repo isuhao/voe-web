@@ -186,3 +186,30 @@ function format_ip(ips) {
 function goto_server_detail(server_id) {
     window.location = 'detail.html?server_id=' + server_id;
 }
+
+function option_set_server_id(opt)
+{
+    $("#edit_channel_modal_dialog #upstream_server_id").val(opt.value);
+}
+
+function update_server_list(update_ready)
+{
+    submit_get_server_list(function (_server_list)
+    {
+        var server_list = _server_list;
+
+        var optionlist = '<option value=""></option>';
+        optionlist = '';
+
+        for (var i = 0; i < server_list.length; i++)
+        {
+            optionlist += '<option value="{0}">{0}({1})</option>\n'.format(server_list[i].id, server_list[i].name);
+        }
+        $("#edit_channel_modal_dialog #server_id_select_list").html(optionlist);
+        $("#edit_channel_modal_dialog #upstream_server_id").prop('value', '');
+
+        update_ready();
+    });
+}
+
+update_server_list(function(){});

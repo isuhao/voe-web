@@ -157,7 +157,7 @@ function update_channel_list(update_ready)
 
         var optionlist = '<option value=""></option>';
         optionlist = '';
-        
+
         for (var i = 0; i < channel_list.length; i++)
         {
             optionlist += '<option value="{0}" onclick="option_set_channel_id(this);">{0}({1})</option>\n'.format(
