@@ -67,7 +67,6 @@ function mod_channel(rowid, channel_id) {
     submitdata['channel_name'] = $("#edit_channel_modal_dialog #edit_channel_dialog #channel_name").val();
     submitdata['source_url'] = $('#edit_channel_modal_dialog #edit_channel_dialog #source_url').val();
     submitdata['is_enable'] = $('#edit_channel_modal_dialog #edit_channel_dialog #is_enable').prop('checked');
-
     if ($('#edit_channel_modal_dialog #edit_channel_dialog #source_server_id').val() != null && $('#edit_channel_dialog #source_server_id').val() != '') {
         submitdata['server_id'] = $('#edit_channel_modal_dialog #edit_channel_dialog #source_server_id').val() | 0;
 
@@ -189,7 +188,7 @@ function goto_server_detail(server_id) {
 
 function option_set_server_id(opt)
 {
-    $("#edit_channel_modal_dialog #upstream_server_id").val(opt.value);
+    $("#edit_channel_modal_dialog #source_server_id").val(opt.value);
 }
 
 function update_server_list(update_ready)
@@ -206,7 +205,7 @@ function update_server_list(update_ready)
             optionlist += '<option value="{0}">{0}({1})</option>\n'.format(server_list[i].id, server_list[i].name);
         }
         $("#edit_channel_modal_dialog #server_id_select_list").html(optionlist);
-        $("#edit_channel_modal_dialog #upstream_server_id").prop('value', '');
+        $("#edit_channel_modal_dialog #source_server_id").prop('value', '');
 
         update_ready();
     });
