@@ -173,7 +173,11 @@ function update_channel_list(update_ready)
 
 function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
 {
-    var server_id = window.server_id; $.getUrlParam('server_id');
+    window.server_id = $.getUrlParam('server_id') | 0;
+
+//    alert($.getUrlParam('server_id'));
+
+    var server_id = window.server_id;
     var page_size = 20;
 
     // 获取服务器状态数据.
@@ -184,14 +188,15 @@ function update_data()	// 在窗口加载的时候，调用登陆，并且请求
 
         var jsonobj = eval(data);
 
+        $('#prepage').prop('href', 'detail.html?server_id={0}&curpage={1}'.format(window.server_id, (window.curpage | 0) - 1));
+        $('#nextpage').prop('href', 'detail.html?server_id={0}&curpage={1}'.format(window.server_id, (window.curpage | 0) + 1));
+
         if (window.curpage > 1) {
-            $('#prepage').prop('href', 'detail.html?curpage={0}'.format((window.curpage | 0) - 1));
             $('#prepage').show();
         }
 
         if (window.curpage < jsonobj["pageCount"]) {
             $('#nextpage').show();
-            $('#nextpage').prop('href', 'detail.html?curpage={0}'.format((window.curpage | 0) + 1));
         }
 
         $('#curPage_indicator').html('当前第{curPage}页, 共{pageCount}页'.format(jsonobj));
@@ -256,7 +261,7 @@ function update_title()
         }
 
         $("#table_title").html('SERVER_ID={1} 服务器详细情况({0} tcpport : {2} udpport :{3})'.format(jsonobj.server_ip, server_id, jsonobj.tport, jsonobj.uport));
-
+1
         setTimeout(update_title, 9900);
     });
 };
