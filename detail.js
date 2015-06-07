@@ -173,10 +173,6 @@ function update_channel_list(update_ready)
 
 function update_data()	// 在窗口加载的时候，调用登陆，并且请求服务器状态数据。
 {
-    window.server_id = $.getUrlParam('server_id') | 0;
-
-//    alert($.getUrlParam('server_id'));
-
     var server_id = window.server_id;
     var page_size = 20;
 
@@ -261,7 +257,6 @@ function update_title()
         }
 
         $("#table_title").html('SERVER_ID={1} 服务器详细情况({0} tcpport : {2} udpport :{3})'.format(jsonobj.server_ip, server_id, jsonobj.tport, jsonobj.uport));
-1
         setTimeout(update_title, 9900);
     });
 };
@@ -381,7 +376,7 @@ window.real_ready = function()
 {
     update_server_list(function ()
     {
-        if(window.server_id)
+        if(window.server_id > 0)
         {
             update_title();
             update_data();
