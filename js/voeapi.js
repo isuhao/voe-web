@@ -4,9 +4,7 @@
 var api_path_base = 'api/';
 
 if (window.location.hostname == "demo.bd2.tv")
-    api_path_base = '///master.demo.bd2.tv:8840/';
-if (window.location.hostname == "127.0.0.1")
-    api_path_base = '///127.0.0.1:8840/';
+    api_path_base = '///master.demo.bd2.tv:8840/api/';
 
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     options.crossDomain ={
