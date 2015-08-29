@@ -4,7 +4,7 @@
 var api_path_base = 'api/';
 
 if (window.location.hostname == "demo.bd2.tv")
-    api_path_base = '///master.demo.bd2.tv:8840/api/';
+    api_path_base = 'http://demo-beansoft.myalauda.cn/api/';
 
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     options.crossDomain ={
